@@ -96,7 +96,7 @@ def preprocess(path):
 
     for p in os.listdir(path):
         if(os.path.isdir(os.path.join(path,p))):
-            ftxt = open("result/"+p+'.txt', 'w')
+            ftxt = open("../data/result/"+p+'.txt', 'w')
             for file in os.listdir(os.path.join(path,p)):
                 if(file.__contains__("pcap")):
                     # print file
