@@ -46,14 +46,17 @@ def transferpacket2matrix(packet,max_len):
     p_len = len(packet)
 
     m = np.zeros(max_len,dtype="float32")
+    # for i in range(max_len):
+    #     m[i] = 255
     for i in range(p_len):
         pc = packet[i]
         a_num = struct.unpack('B', pc)[0]
+        # m[i] = 255-a_num
         m[i] = a_num
     return m
 
 if __name__=="__main__":
-    filename = "/Users/kang/Documents/workspace/voip_identification/ALT/alicall_voice.pcap"
+    filename = "/Users/kang/Documents/workspace/data/skype/skype_voice.pcap"
     (packets,max_len) = pcap2packets(filename)
     m = np.zeros((len(packets), max_len), dtype="float32")
     for i in range(len(packets)):

@@ -147,7 +147,7 @@ def create_model():
 
 if __name__ == "__main__":
     resultpath = "result/"
-    path = "/Users/kang/Documents/workspace/voip_identification/pcap"
+    path = "/Users/kang/Documents/workspace/data/pcap"
     num = preprocess(path)
     print num
     data = np.zeros((num,1,256,54))
