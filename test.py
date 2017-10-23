@@ -1,4 +1,5 @@
 import numpy as np
+import struct
 # from PIL import Image
 # from scipy import signal
 # import matplotlib.pyplot as plt
@@ -41,5 +42,10 @@ import numpy as np
 # b = 111/4*3
 # print b
 
-a = "baidu__bre.pcap"
-print a.split("_")
+# a = "baidu__bre.pcap"
+# print a.split("_")
+a = 0x2123
+flag = struct.unpack('H', "!#")[0]
+print flag
+print int('2321', 16)
+print hex(8993)

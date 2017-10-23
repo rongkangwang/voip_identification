@@ -41,6 +41,99 @@ def pcap2packets(filename):
     print("Max Length:"+str(max_len))
     return (packets,max_len)
 
+def pcap2packetswithpktheader(filename):
+    fpcap = open(filename, 'rb')
+    string_data = fpcap.read()
+    # pcap header
+    pcap_header = {}
+    pcap_header['magic_number'] = string_data[0:4]
+    pcap_header['version_major'] = string_data[4:6]
+    pcap_header['version_minor'] = string_data[6:8]
+    pcap_header['thiszone'] = string_data[8:12]
+    pcap_header['sigfigs'] = string_data[12:16]
+    pcap_header['snaplen'] = string_data[16:20]
+    pcap_header['linktype'] = string_data[20:24]
+
+    num = 0  # packet no.
+    packets = []    # all of the packets
+    pcap_packet_header = {}  # packet header
+    i = 24    # pcap header takes 24 bytes
+    max_len = 0
+    while (i < len(string_data)):
+        # paser packet header
+        pcap_packet_header['GMTtime'] = string_data[i:i + 4]
+        pcap_packet_header['MicroTime'] = string_data[i + 4:i + 8]
+        pcap_packet_header['caplen'] = string_data[i + 8:i + 12]
+        pcap_packet_header['len'] = string_data[i + 12:i + 16]
+        # len is real, so use it
+        packet_len = struct.unpack('I', pcap_packet_header['len'])[0]
+        print(packet_len)
+        if(packet_len>max_len):
+            max_len = packet_len
+        # add packet to packets
+        packets.append(string_data[i:i + 16 + packet_len])
+        i = i + packet_len + 16
+        num += 1
+    fpcap.close()
+    print("Max Length:"+str(max_len))
+    return (packets,max_len)
+
+def isudpwithpktheader(packet):
+    protocol = struct.unpack('B', packet[39])[0]
+    if(protocol == 17):
+        return True
+    else:
+        return False
+
+def istcpwithpktheader(packet):
+    protocol = struct.unpack('B', packet[39])[0]
+    if(protocol == 6):
+        return True
+    else:
+        return False
+
+def ishttpwithpktheader(packet):
+    if(istcpwithpktheader(packet)):
+        flag = struct.unpack('B', packet[63])[0]
+        if(hex(flag) == 0x018):
+            port = struct.unpack('H', packet[53]+packet[52])[0]
+            if(port==8000):
+                return True
+            else:
+                return False
+        else:
+            return False
+    else:
+        return False
+
+def isudp(packet):
+    # print protocol
+    protocol = struct.unpack('B', packet[23])[0]
+    if(protocol == 17):
+        return True
+    else:
+        return False
+
+def istcp(packet):
+    protocol = struct.unpack('B', packet[23])[0]
+    if(protocol == 6):
+        return True
+    else:
+        return False
+
+def ishttp(packet):
+    if(istcpwithpktheader(packet)):
+        flag = struct.unpack('B', packet[47])[0]
+        if(hex(flag) == 0x018):
+            port = struct.unpack('H', packet[37]+packet[36])[0]
+            if(port==8000):
+                return True
+            else:
+                return False
+        else:
+            return False
+    else:
+        return False
 
 def transferpacket2matrix(packet,max_len):
     p_len = len(packet)
@@ -58,9 +151,11 @@ def transferpacket2matrix(packet,max_len):
 if __name__=="__main__":
     filename = "/Users/kang/Documents/workspace/data/skype/skype_voice.pcap"
     (packets,max_len) = pcap2packets(filename)
-    m = np.zeros((len(packets), max_len), dtype="float32")
-    for i in range(len(packets)):
-        p = packets[i]
-        m[i] = transferpacket2matrix(p,max_len)
-    plt.imshow(m, cmap=cm.Greys_r)
-    plt.show()
+    for packet in packets:
+        print isudp(packet)
+    # m = np.zeros((len(packets), max_len), dtype="float32")
+    # for i in range(len(packets)):
+    #     p = packets[i]
+    #     m[i] = transferpacket2matrix(p,max_len)
+    # plt.imshow(m, cmap=cm.Greys_r)
+    # plt.show()
