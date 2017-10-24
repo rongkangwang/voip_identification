@@ -3,6 +3,12 @@ import numpy as np
 import struct
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
+import platform
+
+series_threshold = 2.0/3.0
+series_pktnum = 15
+column = 1000
+row = 1040
 
 def pcap2packets(filename):
     fpcap = open(filename, 'rb')
@@ -78,7 +84,7 @@ def pcap2packetswithpktheader(filename):
     print("Max Length:"+str(max_len))
     return (packets,max_len)
 
-def isudpwithpktheader(packet):
+def isudpwithpktheader(packet):   # isudp: the packet should with the header
     protocol = struct.unpack('B', packet[39])[0]
     if(protocol == 17):
         return True
@@ -97,7 +103,7 @@ def ishttpwithpktheader(packet):
         flag = struct.unpack('B', packet[63])[0]
         if(hex(flag) == 0x018):
             port = struct.unpack('H', packet[53]+packet[52])[0]
-            if(port==8000):
+            if(port==80):
                 return True
             else:
                 return False
@@ -121,12 +127,12 @@ def istcp(packet):
     else:
         return False
 
-def ishttp(packet):
+def ishttp(packet):    # ishttp: the packet should not with the header
     if(istcpwithpktheader(packet)):
         flag = struct.unpack('B', packet[47])[0]
         if(hex(flag) == 0x018):
             port = struct.unpack('H', packet[37]+packet[36])[0]
-            if(port==8000):
+            if(port==80):
                 return True
             else:
                 return False
@@ -135,12 +141,85 @@ def ishttp(packet):
     else:
         return False
 
-def transferpacket2matrix(packet,max_len):
+def getvoicestartandend(packets):
+    start = 0
+    end = 0
+    for i,pkt in enumerate(packets):
+        if(isudpwithpktheader(pkt)):
+            if(isseries(packets[i:i+series_pktnum])):    # decide start position by next 20 packtes
+                start = i
+                break
+    packets = packets[::-1]
+    for i,pkt in enumerate(packets):
+        if(isudpwithpktheader(pkt)):
+            if(isseries(packets[i:i+series_pktnum])):    # decide start position by next 20 packtes
+                end = i
+                break
+    end = len(packets) - end
+    
+    return (start,end-1)
+
+
+def getvoiceend(packets):
+    for i,pkt in enumerate(packets):
+        if(not isudpwithpktheader(pkt)):
+            if(len(packets)-1-i<series_pktnum):
+                if(not isseries(packets[i:])): # decide end position by next 20 packets
+                    end = i
+                    break
+            else:
+                if(not isseries(packets[i:i+series_pktnum])): # decide end position by next 20 packets
+                    end = i
+                    break
+    if(not end+series_pktnum > len(packets)):
+        if(isseries(packets[end+series_pktnum:end+2*series_pktnum])):
+            end = getvoiceend(packets[end+series_pktnum:]) + end + series_pktnum
+    return end
+
+def isseries(packets):      # check next 20 packets, if more than series_threshold, is udp series
+    num = 0
+    l = len(packets)
+    for i,pkt in enumerate(packets):
+        if(isudpwithpktheader(pkt)):
+            num = num + 1
+    print(num,l)
+    if(float(num)/l>=series_threshold):
+        return True
+    else:
+        return False
+
+def getfinalmatrix(packets,start,end):   # not consider the end-start<1000 case
+    # packets1 = packets[0:start-1]
+    # packets2 = packets[start:end]
+    # packets3 = packets[end:] 
+    packets_end = packets[start-1-19:start-1]+packets[start:start+999]+packets[end+1:end+20]
+    m = np.zeros((row, column), dtype="float32")
+    if(start<20):
+        for i in range(start+1):
+            m[i+20-start] = transferpacket2matrix(packets[i])
+    else:
+        for i,pkt in enumerate(packets[start-1-19:start]):
+            m[i] = transferpacket2matrix(pkt)
+    if(len(packets)-end-1<20):
+        for i in range(end+1,len(packets)):
+            print i,end
+            m[len(packets)-1-i+1000] = transferpacket2matrix(packets[i])
+    else:
+        for i,pkt in enumerate(packets[end+1:end+21]):
+            m[end+20-i+1000] = transferpacket2matrix(pkt)
+    for i,pkt in enumerate(packets[start:start+999]):
+            m[i+20] = transferpacket2matrix(pkt)
+    return m
+
+
+def transferpacket2matrix(packet,max_len=1000):
     p_len = len(packet)
 
     m = np.zeros(max_len,dtype="float32")
     # for i in range(max_len):
     #     m[i] = 255
+    if p_len>1000:
+        p_len = 1000
     for i in range(p_len):
         pc = packet[i]
         a_num = struct.unpack('B', pc)[0]
@@ -149,13 +228,20 @@ def transferpacket2matrix(packet,max_len):
     return m
 
 if __name__=="__main__":
-    filename = "/Users/kang/Documents/workspace/data/skype/skype_voice.pcap"
-    (packets,max_len) = pcap2packets(filename)
-    for packet in packets:
-        print isudp(packet)
+    if(platform.uname()[0]=="Linux"):
+        filename = "/home/kang/Documents/data/alt/alt_voice.pcap"
+    else:
+        filename = "/Users/kang/Documents/workspace/data/alt/alt_voice.pcap"
+    (packets_init,max_len) = pcap2packetswithpktheader(filename)
+    (start,end) = getvoicestartandend(packets_init)
+    print (start,end)
+    m = getfinalmatrix(packets_init,start,end)
+    #packets = getfinalpackets(packets_init,start,end)
+    # for packet in packets:
+    #     print isudp(packet)
     # m = np.zeros((len(packets), max_len), dtype="float32")
     # for i in range(len(packets)):
     #     p = packets[i]
     #     m[i] = transferpacket2matrix(p,max_len)
-    # plt.imshow(m, cmap=cm.Greys_r)
-    # plt.show()
+    plt.imshow(m, cmap=cm.Greys_r)
+    plt.show()

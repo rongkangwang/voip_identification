@@ -44,8 +44,10 @@ import struct
 
 # a = "baidu__bre.pcap"
 # print a.split("_")
-a = 0x2123
-flag = struct.unpack('H', "!#")[0]
-print flag
-print int('2321', 16)
-print hex(8993)
+# a = 0x2123
+# flag = struct.unpack('H', "!#")[0]
+# print flag
+# print int('2321', 16)
+# print hex(8993)
+import platform
+print platform.uname()[0]
