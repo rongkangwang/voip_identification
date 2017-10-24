@@ -1,10 +1,4 @@
-#-*- coding: UTF-8 -*-
-"""
-Author: lanbing510
-Environment: Keras2.0.5，Python2.7
-Model: GoogLeNet Inception V1
-"""
-
+#coding:utf-8
 from keras.layers import Conv2D, MaxPooling2D, AveragePooling2D, ZeroPadding2D
 from keras.layers import Flatten, Dense, Dropout
 from keras.layers import Input, concatenate
@@ -13,9 +7,7 @@ from keras import regularizers
 from keras.utils import plot_model
 # from KerasLayers.Custom_layers import LRN2D
 
-
 # Global Constants
-NB_CLASS=1000
 LEARNING_RATE=0.01
 MOMENTUM=0.9
 ALPHA=0.0001
@@ -70,16 +62,20 @@ def inception_module(x,params,concat_axis,padding='same',data_format=DATA_FORMAT
 
 
 def create_model():
-    if DATA_FORMAT=='channels_first':
-        INP_SHAPE=(3,224,224)
-        img_input=Input(shape=INP_SHAPE)
-        CONCAT_AXIS=1
-    elif DATA_FORMAT=='channels_last':
-        INP_SHAPE=(224,224,3)
-        img_input=Input(shape=INP_SHAPE)
-        CONCAT_AXIS=3
-    else:
-        raise Exception('Invalid Dim Ordering: '+str(DIM_ORDERING))
+    # if DATA_FORMAT=='channels_first':
+    #     INP_SHAPE=(3,224,224)
+    #     img_input=Input(shape=INP_SHAPE)
+    #     CONCAT_AXIS=1
+    # elif DATA_FORMAT=='channels_last':
+    #     INP_SHAPE=(224,224,3)
+    #     img_input=Input(shape=INP_SHAPE)
+    #     CONCAT_AXIS=3
+    # else:
+    #     raise Exception('Invalid Dim Ordering: '+str(DIM_ORDERING))
+
+    INP_SHAPE = (28, 28, 1)
+    img_input = Input(shape=INP_SHAPE)
+    CONCAT_AXIS = 3
 
     x=conv2D_lrn2d(img_input,64,(7,7),2,padding='same',lrn2d_norm=False)
     x=MaxPooling2D(pool_size=(3,3),strides=2,padding='same',data_format=DATA_FORMAT)(x)
@@ -103,7 +99,7 @@ def create_model():
 
     x=inception_module(x,params=[(256,),(160,320),(32,128),(128,)],concat_axis=CONCAT_AXIS) #5a
     x=inception_module(x,params=[(384,),(192,384),(48,128),(128,)],concat_axis=CONCAT_AXIS) #5b
-    x=AveragePooling2D(pool_size=(7,7),strides=1,padding='valid',data_format=DATA_FORMAT)(x)
+    x=AveragePooling2D(pool_size=(1,1),strides=1,padding='valid',data_format=DATA_FORMAT)(x)
 
     x=Flatten()(x)
     x=Dropout(DROPOUT)(x)
@@ -129,4 +125,35 @@ def check_print():
 
 
 if __name__=='__main__':
-    check_print()
+    # check_print()
+    from data import load_data
+    from keras.utils import np_utils, generic_utils
+    from keras.optimizers import SGD
+    import random, cPickle
+    from keras.callbacks import EarlyStopping
+
+    data, label = load_data()
+
+    NB_CLASS = 10
+    label = np_utils.to_categorical(label, NB_CLASS)
+
+    x, img_input, CONCAT_AXIS, INP_SHAPE, DATA_FORMAT = create_model()
+    model = Model(input=img_input, output=[x])
+    sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+    model.compile(loss='categorical_crossentropy', optimizer=sgd)
+
+    index = [i for i in range(len(data))]
+    random.shuffle(index)
+    data = data[index]
+    label = label[index]
+    (X_train, X_val) = (data[0:30000], data[30000:])
+    (Y_train, Y_val) = (label[0:30000], label[30000:])
+    X_train = X_train.reshape(X_train.shape[0], 28, 28, 1)
+    X_val = X_val.reshape(X_val.shape[0], 28, 28, 1)
+
+    # 使用early stopping返回最佳epoch对应的model
+    early_stopping = EarlyStopping(monitor='val_loss', patience=1)
+    model.fit(X_train, Y_train, batch_size=100, validation_data=(X_val, Y_val), epochs=5, callbacks=[early_stopping])
+    json_string = model.to_json()
+    open('googlenet_architecture.json', 'w').write(json_string)
+    model.save_weights('googlenet_weights.h5')

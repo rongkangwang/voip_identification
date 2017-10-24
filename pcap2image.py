@@ -182,7 +182,7 @@ def isseries(packets):      # check next 20 packets, if more than series_thresho
     for i,pkt in enumerate(packets):
         if(isudpwithpktheader(pkt)):
             num = num + 1
-    print(num,l)
+    # print(num,l)
     if(float(num)/l>=series_threshold):
         return True
     else:
@@ -196,19 +196,22 @@ def getfinalmatrix(packets,start,end):   # not consider the end-start<1000 case
     m = np.zeros((row, column), dtype="float32")
     if(start<20):
         for i in range(start+1):
+            # print i+20-start
             m[i+20-start] = transferpacket2matrix(packets[i])
     else:
         for i,pkt in enumerate(packets[start-1-19:start]):
+            print i
             m[i] = transferpacket2matrix(pkt)
+    for i,pkt in enumerate(packets[start:start+1000]):
+        # print i
+        m[i+20] = transferpacket2matrix(pkt)
     if(len(packets)-end-1<20):
         for i in range(end+1,len(packets)):
-            print i,end
-            m[len(packets)-1-i+1000] = transferpacket2matrix(packets[i])
+            m[i - end - 1 + 1000] = transferpacket2matrix(packets[i])
     else:
         for i,pkt in enumerate(packets[end+1:end+21]):
-            m[end+20-i+1000] = transferpacket2matrix(pkt)
-    for i,pkt in enumerate(packets[start:start+999]):
-            m[i+20] = transferpacket2matrix(pkt)
+            m[i - end - 1 + 1000] = transferpacket2matrix(pkt)
+
     return m
 
 
@@ -230,8 +233,8 @@ def transferpacket2matrix(packet,max_len=1000):
 if __name__=="__main__":
     if(platform.uname()[0]=="Linux"):
         filename = "/home/kang/Documents/data/alt/alt_voice.pcap"
-    else:
-        filename = "/Users/kang/Documents/workspace/data/alt/alt_voice.pcap"
+    elif(platform.uname()[0] == "Darwin"):
+        filename = "/Users/kang/Documents/workspace/data/skype/skype_voice.pcap"
     (packets_init,max_len) = pcap2packetswithpktheader(filename)
     (start,end) = getvoicestartandend(packets_init)
     print (start,end)
@@ -244,4 +247,5 @@ if __name__=="__main__":
     #     p = packets[i]
     #     m[i] = transferpacket2matrix(p,max_len)
     plt.imshow(m, cmap=cm.Greys_r)
+    plt.savefig("../data/skype_image/skype_voice.png")
     plt.show()
