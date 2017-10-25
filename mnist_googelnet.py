@@ -8,6 +8,7 @@ from keras.utils import plot_model
 # from KerasLayers.Custom_layers import LRN2D
 
 # Global Constants
+NB_CLASS = 10
 LEARNING_RATE=0.01
 MOMENTUM=0.9
 ALPHA=0.0001
@@ -103,8 +104,8 @@ def create_model():
 
     x=Flatten()(x)
     x=Dropout(DROPOUT)(x)
-    x=Dense(output_dim=NB_CLASS,activation='linear')(x)
-    x=Dense(output_dim=NB_CLASS,activation='softmax')(x)
+    x=Dense(units=NB_CLASS,activation='linear')(x)
+    x=Dense(units=NB_CLASS,activation='softmax')(x)
 
     return x,img_input,CONCAT_AXIS,INP_SHAPE,DATA_FORMAT
 
@@ -134,12 +135,12 @@ if __name__=='__main__':
 
     data, label = load_data()
 
-    NB_CLASS = 10
     label = np_utils.to_categorical(label, NB_CLASS)
 
     x, img_input, CONCAT_AXIS, INP_SHAPE, DATA_FORMAT = create_model()
     model = Model(input=img_input, output=[x])
-    sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+    # sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+    sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
     model.compile(loss='categorical_crossentropy', optimizer=sgd)
 
     index = [i for i in range(len(data))]
