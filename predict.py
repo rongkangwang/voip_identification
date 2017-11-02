@@ -1,5 +1,5 @@
 from keras.models import model_from_json
-import h5py
+# import h5py
 from PIL import Image
 import numpy as np
 
@@ -12,4 +12,4 @@ def predict(image):
 	print(model.predict_classes(arr))
 
 if __name__=="__main__":
-	predict("./1.184.jpg")
+	predict("../data/mnist/1.184.jpg")

@@ -49,5 +49,52 @@ import struct
 # print flag
 # print int('2321', 16)
 # print hex(8993)
-import platform
-print platform.uname()[0]
+
+from keras.models import Sequential
+from keras.layers.core import Dense, Dropout, Activation, Flatten
+#from keras.layers.convolutional import Convolution2D, MaxPooling2D
+from keras.layers.convolutional import Conv2D, MaxPooling2D
+from keras.optimizers import SGD
+from keras.utils import np_utils, generic_utils
+from six.moves import range
+from data import load_data
+import random,cPickle
+from keras.callbacks import EarlyStopping
+import numpy as np
+
+nb_class = 10
+
+def create_model():
+	model = Sequential()
+	model.add(Conv2D(4, (5, 5), padding='valid',input_shape=(28,28,1))) 
+	model.add(Activation('relu'))
+
+	model.add(Conv2D(8,(3, 3), padding='valid'))
+	model.add(Activation('relu'))
+	model.add(MaxPooling2D(pool_size=(2, 2)))
+
+	model.add(Conv2D(16,(3, 3), padding='valid')) 
+	model.add(Activation('relu'))
+	model.add(MaxPooling2D(pool_size=(2, 2)))
+
+	model.add(Flatten())
+	model.add(Dense(128, kernel_initializer='normal'))
+	model.add(Activation('relu'))
+
+	model.add(Dense(nb_class, kernel_initializer='normal'))
+	model.add(Activation('softmax'))
+	return model
+
+model = create_model()
+model.summary()
+
+# import random
+# data = [1 ,2, 3]
+# index = [i for i in range(len(data))]
+# random.shuffle(index)
+# print(index)
+# data = data[index]
+# print(data[index])
+# import numpy as np
+# l = [[1,2,3],[5,6,7]]
+# print l.size()
