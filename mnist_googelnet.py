@@ -74,7 +74,7 @@ def create_model():
     # else:
     #     raise Exception('Invalid Dim Ordering: '+str(DIM_ORDERING))
 
-    INP_SHAPE = (28, 28, 1)
+    INP_SHAPE = (224, 224, 1)
     img_input = Input(shape=INP_SHAPE)
     CONCAT_AXIS = 3
 
@@ -119,42 +119,42 @@ def check_print():
     model.summary()
 
     # Save a PNG of the Model Build
-    plot_model(model,to_file='GoogLeNet.png')
+    # plot_model(model,to_file='GoogLeNet.png')
 
-    model.compile(optimizer='rmsprop',loss='categorical_crossentropy')
+    # model.compile(optimizer='rmsprop',loss='categorical_crossentropy')
     print 'Model Compiled'
 
 
 if __name__=='__main__':
-    # check_print()
-    from data import load_data
-    from keras.utils import np_utils, generic_utils
-    from keras.optimizers import SGD
-    import random, cPickle
-    from keras.callbacks import EarlyStopping
-
-    data, label = load_data()
-
-    label = np_utils.to_categorical(label, NB_CLASS)
-
-    x, img_input, CONCAT_AXIS, INP_SHAPE, DATA_FORMAT = create_model()
-    model = Model(input=img_input, output=[x])
-    # sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-    sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
-    model.compile(loss='categorical_crossentropy', optimizer=sgd)
-
-    index = [i for i in range(len(data))]
-    random.shuffle(index)
-    data = data[index]
-    label = label[index]
-    (X_train, X_val) = (data[0:30000], data[30000:])
-    (Y_train, Y_val) = (label[0:30000], label[30000:])
-    X_train = X_train.reshape(X_train.shape[0], 28, 28, 1)
-    X_val = X_val.reshape(X_val.shape[0], 28, 28, 1)
-
-    # 使用early stopping返回最佳epoch对应的model
-    early_stopping = EarlyStopping(monitor='val_loss', patience=1)
-    model.fit(X_train, Y_train, batch_size=100, validation_data=(X_val, Y_val), epochs=5, callbacks=[early_stopping])
-    json_string = model.to_json()
-    open('googlenet_architecture.json', 'w').write(json_string)
-    model.save_weights('googlenet_weights.h5')
+    check_print()
+    # from data import load_data
+    # from keras.utils import np_utils, generic_utils
+    # from keras.optimizers import SGD
+    # import random, cPickle
+    # from keras.callbacks import EarlyStopping
+    #
+    # data, label = load_data()
+    #
+    # label = np_utils.to_categorical(label, NB_CLASS)
+    #
+    # x, img_input, CONCAT_AXIS, INP_SHAPE, DATA_FORMAT = create_model()
+    # model = Model(input=img_input, output=[x])
+    # # sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+    # sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
+    # model.compile(loss='categorical_crossentropy', optimizer=sgd)
+    #
+    # index = [i for i in range(len(data))]
+    # random.shuffle(index)
+    # data = data[index]
+    # label = label[index]
+    # (X_train, X_val) = (data[0:30000], data[30000:])
+    # (Y_train, Y_val) = (label[0:30000], label[30000:])
+    # X_train = X_train.reshape(X_train.shape[0], 28, 28, 1)
+    # X_val = X_val.reshape(X_val.shape[0], 28, 28, 1)
+    #
+    # # 使用early stopping返回最佳epoch对应的model
+    # early_stopping = EarlyStopping(monitor='val_loss', patience=1)
+    # model.fit(X_train, Y_train, batch_size=100, validation_data=(X_val, Y_val), epochs=5, callbacks=[early_stopping])
+    # json_string = model.to_json()
+    # open('googlenet_architecture.json', 'w').write(json_string)
+    # model.save_weights('googlenet_weights.h5')
