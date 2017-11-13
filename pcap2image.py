@@ -9,6 +9,7 @@ series_threshold = 2.0/3.0
 series_pktnum = 15
 column = 1000
 row = 1040
+type = "uu"
 
 def pcap2packets(filename):
     fpcap = open(filename, 'rb')
@@ -230,22 +231,61 @@ def transferpacket2matrix(packet,max_len=1000):
         m[i] = a_num
     return m
 
+def transferpacket2matrix224(packet,max_len=224):
+    p_len = len(packet)
+
+    m = np.zeros(max_len,dtype="float32")
+    # for i in range(max_len):
+    #     m[i] = 255
+    if p_len>224:
+        p_len = 224
+    for i in range(p_len):
+        pc = packet[i]
+        a_num = struct.unpack('B', pc)[0]
+        # m[i] = 255-a_num
+        m[i] = a_num
+    return m
+
+def get224img(packets):
+    pkts = []
+    for packet in packets:
+        if(isudpwithpktheader(packet)):
+            pkts.append(packet)
+    udplen = len(pkts)
+    num = udplen/224
+    print num
+    for i in range(num):
+        ps = pkts[0+i*224:223+i*224]
+        m = np.zeros((224, 224), dtype="float32")
+        for j in range(len(ps)):
+            p = ps[j]
+            m[j] = transferpacket2matrix224(p,224)
+        plt.imshow(m, cmap=cm.Greys_r)
+        plt.savefig("../data/224/"+type+"/"+type+str(i+1)+".png")
+        #plt.show()
+        #plt.close()
+
+
+
+
+
 if __name__=="__main__":
     if(platform.uname()[0]=="Linux"):
-        filename = "/home/kang/Documents/data/alt/alt_voice.pcap"
+        filename = "/home/kang/Documents/data/"+type+"/"+type+"_voice.pcap"
     elif(platform.uname()[0] == "Darwin"):
-        filename = "/Users/kang/Documents/workspace/data/skype/skype_voice.pcap"
+        filename = "/Users/kang/Documents/workspace/data/"+type+"/"+type+"_voice.pcap"
     (packets_init,max_len) = pcap2packetswithpktheader(filename)
-    (start,end) = getvoicestartandend(packets_init)
-    print (start,end)
-    m = getfinalmatrix(packets_init,start,end)
-    #packets = getfinalpackets(packets_init,start,end)
-    # for packet in packets:
-    #     print isudp(packet)
-    # m = np.zeros((len(packets), max_len), dtype="float32")
-    # for i in range(len(packets)):
-    #     p = packets[i]
-    #     m[i] = transferpacket2matrix(p,max_len)
-    plt.imshow(m, cmap=cm.Greys_r)
-    plt.savefig("../data/skype_image/skype_voice.png")
-    plt.show()
+    get224img(packets_init)
+    # (start,end) = getvoicestartandend(packets_init)
+    # print (start,end)
+    # m = getfinalmatrix(packets_init,start,end)
+    # #packets = getfinalpackets(packets_init,start,end)
+    # # for packet in packets:
+    # #     print isudp(packet)
+    # # m = np.zeros((len(packets), max_len), dtype="float32")
+    # # for i in range(len(packets)):
+    # #     p = packets[i]
+    # #     m[i] = transferpacket2matrix(p,max_len)
+    # plt.imshow(m, cmap=cm.Greys_r)
+    # plt.savefig("../data/skype_image/skype_voice.png")
+    # plt.show()
