@@ -9,7 +9,7 @@ series_threshold = 2.0/3.0
 series_pktnum = 15
 column = 1000
 row = 1040
-type = "uu"
+type = "skype"
 
 def pcap2packets(filename):
     fpcap = open(filename, 'rb')
@@ -37,7 +37,7 @@ def pcap2packets(filename):
         pcap_packet_header['len'] = string_data[i + 12:i + 16]
         # len is real, so use it
         packet_len = struct.unpack('I', pcap_packet_header['len'])[0]
-        print(packet_len)
+        # print(packet_len)
         if(packet_len>max_len):
             max_len = packet_len
         # add packet to packets
@@ -45,8 +45,13 @@ def pcap2packets(filename):
         i = i + packet_len + 16
         num += 1
     fpcap.close()
-    print("Max Length:"+str(max_len))
+    #print("Max Length:"+str(max_len))
+    print(len(packets))
     return (packets,max_len)
+
+def skypepcap2img(filename):
+    return
+
 
 def pcap2packetswithpktheader(filename):
     fpcap = open(filename, 'rb')
@@ -82,7 +87,7 @@ def pcap2packetswithpktheader(filename):
         i = i + packet_len + 16
         num += 1
     fpcap.close()
-    print("Max Length:"+str(max_len))
+    # print("Max Length:"+str(max_len))
     return (packets,max_len)
 
 def isudpwithpktheader(packet):   # isudp: the packet should with the header
@@ -246,7 +251,7 @@ def transferpacket2matrix224(packet,max_len=224):
         m[i] = a_num
     return m
 
-def get224img(packets):
+def get224imgwithpktheader(packets):
     pkts = []
     for packet in packets:
         if(isudpwithpktheader(packet)):
@@ -265,17 +270,45 @@ def get224img(packets):
         #plt.show()
         #plt.close()
 
+def get224img(packets):
+    global imagecount
+    pkts = []
+    for packet in packets:
+        if(isudp(packet)):
+            pkts.append(packet)
+    udplen = len(pkts)
+    num = udplen/224
+    print num
+    for i in range(num):
+        ps = pkts[0+i*224:223+i*224]
+        m = np.zeros((224, 224), dtype="float32")
+        for j in range(len(ps)):
+            p = ps[j]
+            m[j] = transferpacket2matrix224(p,224)
+        plt.imshow(m, cmap=cm.Greys_r)
+        plt.savefig("../data/224/"+type+"/"+type+str(imagecount)+".png")
+        imagecount = imagecount+1
 
-
-
+imagecount = 1
 
 if __name__=="__main__":
-    if(platform.uname()[0]=="Linux"):
-        filename = "/home/kang/Documents/data/"+type+"/"+type+"_voice.pcap"
-    elif(platform.uname()[0] == "Darwin"):
-        filename = "/Users/kang/Documents/workspace/data/"+type+"/"+type+"_voice.pcap"
-    (packets_init,max_len) = pcap2packetswithpktheader(filename)
-    get224img(packets_init)
+    # if(platform.uname()[0]=="Linux"):
+    #     filename = "/home/kang/Documents/data/"+type+"/"+type+"_voice.pcap"
+    # elif(platform.uname()[0] == "Darwin"):
+    #     filename = "/Users/kang/Documents/workspace/data/"+type+"/"+type+"_voice.pcap"
+    if (platform.uname()[0] == "Linux"):
+        filepath = "/home/kang/Documents/data/" + type
+    elif (platform.uname()[0] == "Darwin"):
+        filepath = "/Users/kang/Documents/workspace/data/" + type
+    # (packets_init,max_len) = pcap2packetswithpktheader(filename)
+    # get224imgwithpktheader(packets_init)
+    import os
+    for file in os.listdir(filepath):
+        if(file.__contains__(type)):
+            print(file)
+            filename = os.path.join(filepath, file)
+            (packets_init, max_len) = pcap2packets(filename)
+            get224img(packets_init)
     # (start,end) = getvoicestartandend(packets_init)
     # print (start,end)
     # m = getfinalmatrix(packets_init,start,end)
