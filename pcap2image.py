@@ -50,7 +50,26 @@ def pcap2packets(filename):
     return (packets,max_len)
 
 def skypepcap2img(filename):
-    return
+    global imagecount
+    fpcap = open(filename, 'rb')
+    pcap_header = fpcap.read(24)
+    packets = []
+    i = 0
+    packet_header = fpcap.read(16)
+    while(packet_header != '' and pcap_header != None):
+        packet_len = struct.unpack('I', packet_header[12:16])[0]
+        packet = fpcap.read(packet_len)
+        if(isudp(packet)):
+            packets.append(packet)
+            i = i+1
+        if(i==224):
+            get224imgsingle(packets)
+            imagecount = imagecount+1
+            packets = []
+            i = 0
+        packet_header = fpcap.read(16)
+    fpcap.close()
+
 
 
 def pcap2packetswithpktheader(filename):
@@ -270,6 +289,15 @@ def get224imgwithpktheader(packets):
         #plt.show()
         #plt.close()
 
+def get224imgsingle(packets):
+    global imagecount
+    m = np.zeros((224, 224), dtype="float32")
+    for j in range(len(packets)):
+        p = packets[j]
+        m[j] = transferpacket2matrix224(p,224)
+    plt.imshow(m, cmap=cm.Greys_r)
+    plt.savefig("../data/224/"+type+"/"+type+str(imagecount)+".png")
+
 def get224img(packets):
     global imagecount
     pkts = []
@@ -307,8 +335,9 @@ if __name__=="__main__":
         if(file.__contains__(type)):
             print(file)
             filename = os.path.join(filepath, file)
-            (packets_init, max_len) = pcap2packets(filename)
-            get224img(packets_init)
+            # (packets_init, max_len) = pcap2packets(filename)
+            # get224img(packets_init)
+            skypepcap2img(filename)
     # (start,end) = getvoicestartandend(packets_init)
     # print (start,end)
     # m = getfinalmatrix(packets_init,start,end)
