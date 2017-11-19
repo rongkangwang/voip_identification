@@ -11,6 +11,50 @@ column = 1000
 row = 1040
 type = "skype"
 
+def pcap2packetspayload(filename):
+    fpcap = open(filename, 'rb')
+    string_data = fpcap.read()
+    # pcap header
+    pcap_header = {}
+    pcap_header['magic_number'] = string_data[0:4]
+    pcap_header['version_major'] = string_data[4:6]
+    pcap_header['version_minor'] = string_data[6:8]
+    pcap_header['thiszone'] = string_data[8:12]
+    pcap_header['sigfigs'] = string_data[12:16]
+    pcap_header['snaplen'] = string_data[16:20]
+    pcap_header['linktype'] = string_data[20:24]
+
+    num = 0  # packet no.
+    packets = []    # all of the packets
+    pcap_packet_header = {}  # packet header
+    i = 24    # pcap header takes 24 bytes
+    max_len = 0
+    while (i < len(string_data)):
+        # paser packet header
+        pcap_packet_header['GMTtime'] = string_data[i:i + 4]
+        pcap_packet_header['MicroTime'] = string_data[i + 4:i + 8]
+        pcap_packet_header['caplen'] = string_data[i + 8:i + 12]
+        pcap_packet_header['len'] = string_data[i + 12:i + 16]
+        # len is real, so use it
+        #packet_len = struct.unpack('I', pcap_packet_header['len'])[0]
+        packet_len = struct.unpack('I', pcap_packet_header['caplen'])[0]
+        #print(str(packet_len)+" "+str(packet_len1))
+        # if(packet_len>1000):
+        #     packet_len = packet_len1
+        # if(packet_len>max_len):
+        #     max_len = packet_len
+        # add packet to packets
+        packet = string_data[i + 16:i + 16 + packet_len]
+        if(isudp(packet)):
+            payload = packet[42:]
+            packets.append(payload)
+        i = i + packet_len + 16
+        num += 1
+    fpcap.close()
+    #print("Max Length:"+str(max_len))
+    print(len(packets))
+    return (packets,max_len)
+
 def pcap2packets(filename):
     fpcap = open(filename, 'rb')
     string_data = fpcap.read()
@@ -36,8 +80,11 @@ def pcap2packets(filename):
         pcap_packet_header['caplen'] = string_data[i + 8:i + 12]
         pcap_packet_header['len'] = string_data[i + 12:i + 16]
         # len is real, so use it
-        packet_len = struct.unpack('I', pcap_packet_header['len'])[0]
-        # print(packet_len)
+        #packet_len = struct.unpack('I', pcap_packet_header['len'])[0]
+        packet_len = struct.unpack('I', pcap_packet_header['caplen'])[0]
+        #print(str(packet_len)+" "+str(packet_len1))
+        # if(packet_len>1000):
+        #     packet_len = packet_len1
         if(packet_len>max_len):
             max_len = packet_len
         # add packet to packets
@@ -49,6 +96,32 @@ def pcap2packets(filename):
     print(len(packets))
     return (packets,max_len)
 
+def skypepcap2imgpayload(filename):
+    global imagecount
+    fpcap = open(filename, 'rb')
+    pcap_header = fpcap.read(24)
+    packets = []
+    i = 0
+    packet_header = fpcap.read(16)
+    while(len(packet_header)==16):
+        # print(len(packet_header))
+        # packet_len = struct.unpack('I', packet_header[12:16])[0]
+        packet_len = struct.unpack('I', packet_header[8:12])[0]
+        # print(packet_len)
+        packet = fpcap.read(packet_len)
+        if(isudp(packet)):
+            packet = packet[42:]
+            packets.append(packet)
+            i = i+1
+        if(i==224):
+            get224imgsingle(packets)
+            imagecount = imagecount+1
+            packets = []
+            i = 0
+        packet_header = fpcap.read(16)
+
+    fpcap.close()
+
 def skypepcap2img(filename):
     global imagecount
     fpcap = open(filename, 'rb')
@@ -56,8 +129,11 @@ def skypepcap2img(filename):
     packets = []
     i = 0
     packet_header = fpcap.read(16)
-    while(packet_header != '' and pcap_header != None):
-        packet_len = struct.unpack('I', packet_header[12:16])[0]
+    while(len(packet_header)==16):
+        # print(len(packet_header))
+        # packet_len = struct.unpack('I', packet_header[12:16])[0]
+        packet_len = struct.unpack('I', packet_header[8:12])[0]
+        # print(packet_len)
         packet = fpcap.read(packet_len)
         if(isudp(packet)):
             packets.append(packet)
@@ -68,6 +144,7 @@ def skypepcap2img(filename):
             packets = []
             i = 0
         packet_header = fpcap.read(16)
+
     fpcap.close()
 
 
@@ -295,8 +372,31 @@ def get224imgsingle(packets):
     for j in range(len(packets)):
         p = packets[j]
         m[j] = transferpacket2matrix224(p,224)
-    plt.imshow(m, cmap=cm.Greys_r)
-    plt.savefig("../data/224/"+type+"/"+type+str(imagecount)+".png")
+    im = np.array(m)
+    im = im.reshape(224, 224)
+    from scipy.misc import imsave
+    # from matplotlib.pyplot import imsave
+    imsave("../data/224/" + type + "/" + type + str(imagecount) + ".png", im)
+
+def get224imgpayload(pkts):
+    global imagecount
+    udplen = len(pkts)
+    num = udplen/224
+    print num
+    for i in range(num):
+        ps = pkts[0+i*224:223+i*224]
+        m = np.zeros((224, 224), dtype="float32")
+        for j in range(len(ps)):
+            p = ps[j]
+            m[j] = transferpacket2matrix224(p,224)
+        # plt.imshow(m, cmap=cm.Greys_r)
+        # plt.savefig("../data/224/"+type+"/"+type+str(imagecount)+".png")
+        im = np.array(m)
+        im = im.reshape(224, 224)
+        from scipy.misc import imsave
+        # from matplotlib.pyplot import imsave
+        imsave("../data/224/"+type+"/"+type+str(imagecount)+".png", im)
+        imagecount = imagecount+1
 
 def get224img(packets):
     global imagecount
@@ -313,8 +413,13 @@ def get224img(packets):
         for j in range(len(ps)):
             p = ps[j]
             m[j] = transferpacket2matrix224(p,224)
-        plt.imshow(m, cmap=cm.Greys_r)
-        plt.savefig("../data/224/"+type+"/"+type+str(imagecount)+".png")
+        # plt.imshow(m, cmap=cm.Greys_r)
+        # plt.savefig("../data/224/"+type+"/"+type+str(imagecount)+".png")
+        im = np.array(m)
+        im = im.reshape(224, 224)
+        from scipy.misc import imsave
+        # from matplotlib.pyplot import imsave
+        imsave("../data/224/"+type+"/"+type+str(imagecount)+".png", im)
         imagecount = imagecount+1
 
 imagecount = 1
@@ -333,11 +438,16 @@ if __name__=="__main__":
     import os
     for file in os.listdir(filepath):
         if(file.__contains__(type)):
-            print(file)
             filename = os.path.join(filepath, file)
+            # print(filename)
             # (packets_init, max_len) = pcap2packets(filename)
             # get224img(packets_init)
-            skypepcap2img(filename)
+            # skype payload only
+            #skypepcap2imgpayload(filename)
+            #skypepcap2img(filename)
+            # payload only()udp
+            # (packets_init, max_len) = pcap2packetspayload(filename)
+            # get224imgpayload(packets_init)
     # (start,end) = getvoicestartandend(packets_init)
     # print (start,end)
     # m = getfinalmatrix(packets_init,start,end)

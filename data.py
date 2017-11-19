@@ -23,6 +23,7 @@ def load_data():
 		data[i,:,:,:] = arr
 		label[i] = int(imgs[i].split('.')[0])
 	#归一化和零均值化
+	#print(np.max(data))
 	data /= np.max(data)
 	data -= np.mean(data)
 	return data,label
