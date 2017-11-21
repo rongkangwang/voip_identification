@@ -7,21 +7,6 @@ import platform
 
 
 def load_data():
-	data = np.empty((42000,1,28,28),dtype="float32")
-	label = np.empty((42000,),dtype="uint8")
-	imgs = os.listdir("../data/mnist")
-	num = len(imgs)
-	for i in range(num):
-		img = Image.open("../data/mnist/"+imgs[i])
-		arr = np.asarray(img,dtype="float32")
-		data[i,:,:,:] = arr
-		label[i] = int(imgs[i].split('.')[0])
-	#归一化和零均值化
-	data /= np.max(data)
-	data -= np.mean(data)
-	return data,label
-
-def load_data():
     if (platform.uname()[0] == "Linux"):
         filepath = "/home/kang/Documents/data/224/"
     elif (platform.uname()[0] == "Darwin"):

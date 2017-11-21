@@ -147,8 +147,8 @@ if __name__=='__main__':
     random.shuffle(index)
     data = data[index]
     label = label[index]
-    (X_train, X_val) = (data[0:15000], data[15000:])
-    (Y_train, Y_val) = (label[0:15000], label[15000:])
+    (X_train, X_val) = (data[0:2500], data[2500:])
+    (Y_train, Y_val) = (label[0:2500], label[2500:])
 
     # 使用early stopping返回最佳epoch对应的model
     early_stopping = EarlyStopping(monitor='val_loss', patience=1)

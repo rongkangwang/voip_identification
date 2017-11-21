@@ -446,8 +446,8 @@ if __name__=="__main__":
             #skypepcap2imgpayload(filename)
             #skypepcap2img(filename)
             # payload only()udp
-            # (packets_init, max_len) = pcap2packetspayload(filename)
-            # get224imgpayload(packets_init)
+            (packets_init, max_len) = pcap2packetspayload(filename)
+            get224imgpayload(packets_init)
     # (start,end) = getvoicestartandend(packets_init)
     # print (start,end)
     # m = getfinalmatrix(packets_init,start,end)
