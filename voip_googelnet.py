@@ -8,7 +8,7 @@ from keras.utils import plot_model
 # from KerasLayers.Custom_layers import LRN2D
 
 # Global Constants
-NB_CLASS = 2
+NB_CLASS = 5
 LEARNING_RATE=0.01
 MOMENTUM=0.9
 ALPHA=0.0001
@@ -147,8 +147,8 @@ if __name__=='__main__':
     random.shuffle(index)
     data = data[index]
     label = label[index]
-    (X_train, X_val) = (data[0:15000], data[15000:])
-    (Y_train, Y_val) = (label[0:15000], label[15000:])
+    (X_train, X_val) = (data[0:2000], data[2000:])
+    (Y_train, Y_val) = (label[0:2000], label[2000:])
 
     # 使用early stopping返回最佳epoch对应的model
     early_stopping = EarlyStopping(monitor='val_loss', patience=1)

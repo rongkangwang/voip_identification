@@ -42,6 +42,12 @@ def load_data():
                         l.append(0)
                     elif(di=="jumblo"):
                         l.append(1)
+                    elif (di == "kc"):
+                        l.append(2)
+                    elif (di == "uu"):
+                        l.append(3)
+                    elif (di == "alt"):
+                        l.append(4)
     data = np.asarray(d,dtype="float32")
     label = np.asarray(l,dtype="float32")
     data /= np.max(data)
