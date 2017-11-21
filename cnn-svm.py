@@ -11,6 +11,7 @@ from sklearn.preprocessing import MinMaxScaler
 from data_voip import load_data
 import random
 from keras.models import model_from_json
+import numpy as np
 
 
 def svc(traindata,trainlabel,testdata,testlabel):
@@ -45,8 +46,8 @@ if __name__ == "__main__":
     # print(data)
     # data = data.reshape(data.shape[0], 28, 28, 1)
 
-    (traindata,testdata) = (data[0:2000],data[2000:])
-    (trainlabel,testlabel) = (label[0:2000],label[2000:])
+    (traindata,testdata) = (data[0:1],data[1:])
+    (trainlabel,testlabel) = (label[0:1],label[1:])
     # traindata = traindata.reshape(traindata.shape[0], 28, 28, 1)
     # testdata = testdata.reshape(testdata.shape[0], 28, 28, 1)
 
@@ -56,9 +57,10 @@ if __name__ == "__main__":
     origin_model.load_weights("googlenet_weights.h5")
     # origin_model = tf2th(origin_model)
     #print(origin_model.layers)
-    pred_testlabel = origin_model.predict_classes(testdata,batch_size=1, verbose=1)
+    pred_testlabel = origin_model.predict(testdata,batch_size=1, verbose=1)
+
     num = len(testlabel)
-    accuracy = len([1 for i in range(num) if testlabel[i]==pred_testlabel[i]])/float(num)
+    accuracy = len([1 for i in range(num) if testlabel[i]==np.argmax(pred_testlabel[i])])/float(num)
     print(" Origin_model Accuracy:",accuracy)
     # extract the feature using keras from first layer to last layer
     from keras import backend as K
@@ -71,4 +73,4 @@ if __name__ == "__main__":
     #train svm using FC-layer feature
     scaler = MinMaxScaler()
     feature = scaler.fit_transform(feature)
-    svc(feature[0:2000],label[0:2000],feature[2000:],label[2000:])
+    svc(feature[0:5000],label[0:5000],feature[5000:],label[5000:])

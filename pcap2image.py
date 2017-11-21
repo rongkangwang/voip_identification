@@ -9,7 +9,7 @@ series_threshold = 2.0/3.0
 series_pktnum = 15
 column = 1000
 row = 1040
-type = "skype"
+type = "jumblo"
 
 def pcap2packetspayload(filename):
     fpcap = open(filename, 'rb')
