@@ -10,6 +10,7 @@ series_pktnum = 15
 column = 1000
 row = 1040
 type = "jumblo"
+pktnum = 112
 
 def pcap2packetspayload(filename):
     fpcap = open(filename, 'rb')
@@ -362,7 +363,7 @@ def get224imgwithpktheader(packets):
             p = ps[j]
             m[j] = transferpacket2matrix224(p,224)
         plt.imshow(m, cmap=cm.Greys_r)
-        plt.savefig("../data/224/"+type+"/"+type+str(i+1)+".png")
+        plt.savefig("../data/"+str(pktnum)+"/"+type+"/"+type+str(i+1)+".png")
         #plt.show()
         #plt.close()
 
@@ -376,15 +377,15 @@ def get224imgsingle(packets):
     im = im.reshape(224, 224)
     from scipy.misc import imsave
     # from matplotlib.pyplot import imsave
-    imsave("../data/224/" + type + "/" + type + str(imagecount) + ".png", im)
+    imsave("../data/"+str(pktnum)+"/" + type + "/" + type + str(imagecount) + ".png", im)
 
 def get224imgpayload(pkts):
     global imagecount
     udplen = len(pkts)
-    num = udplen/224
+    num = udplen/pktnum
     print num
     for i in range(num):
-        ps = pkts[0+i*224:223+i*224]
+        ps = pkts[0+i*pktnum:(pktnum-1)+i*pktnum]
         m = np.zeros((224, 224), dtype="float32")
         for j in range(len(ps)):
             p = ps[j]
@@ -395,7 +396,7 @@ def get224imgpayload(pkts):
         im = im.reshape(224, 224)
         from scipy.misc import imsave
         # from matplotlib.pyplot import imsave
-        imsave("../data/224/"+type+"/"+type+str(imagecount)+".png", im)
+        imsave("../data/"+str(pktnum)+"/"+type+"/"+type+str(imagecount)+".png", im)
         imagecount = imagecount+1
 
 def get224img(packets):
@@ -419,7 +420,7 @@ def get224img(packets):
         im = im.reshape(224, 224)
         from scipy.misc import imsave
         # from matplotlib.pyplot import imsave
-        imsave("../data/224/"+type+"/"+type+str(imagecount)+".png", im)
+        imsave("../data/"+str(pktnum)+"/"+type+"/"+type+str(imagecount)+".png", im)
         imagecount = imagecount+1
 
 imagecount = 1

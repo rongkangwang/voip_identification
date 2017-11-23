@@ -8,9 +8,9 @@ import platform
 
 def load_data():
     if (platform.uname()[0] == "Linux"):
-        filepath = "/home/kang/Documents/data/224/"
+        filepath = "/home/kang/Documents/data/112/"
     elif (platform.uname()[0] == "Darwin"):
-        filepath = "/Users/kang/Documents/workspace/data/224/"
+        filepath = "/Users/kang/Documents/workspace/data/112/"
 
     d = []
     l = []
