@@ -10,7 +10,7 @@ series_pktnum = 15
 column = 1000
 row = 1040
 type = "jumblo"
-pktnum = 112
+pktnum = 10
 
 def pcap2packetspayload(filename):
     fpcap = open(filename, 'rb')

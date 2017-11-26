@@ -46,19 +46,23 @@ if __name__ == "__main__":
     # print(data)
     # data = data.reshape(data.shape[0], 28, 28, 1)
 
-    (traindata,testdata) = (data[0:1],data[1:])
-    (trainlabel,testlabel) = (label[0:1],label[1:])
+    (traindata,testdata) = (data[0:2000],data[2000:8000])
+    (trainlabel,testlabel) = (label[0:2000],label[2000:8000])
     # traindata = traindata.reshape(traindata.shape[0], 28, 28, 1)
     # testdata = testdata.reshape(testdata.shape[0], 28, 28, 1)
 
     # use origin_model to predict testdata
     # origin_model = cPickle.load(open("model.pkl","rb"))
-    origin_model = model_from_json(open("googlenet_architecture.json").read())
-    origin_model.load_weights("googlenet_weights.h5")
+    origin_model = model_from_json(open("googlenet_architecture_10.json").read())
+    origin_model.load_weights("googlenet_weights_10.h5")
     # origin_model = tf2th(origin_model)
     #print(origin_model.layers)
     pred_testlabel = origin_model.predict(testdata,batch_size=1, verbose=1)
-
+    print(pred_testlabel)
+    file = open('pred_testlabel_10', 'w')
+    for pred in pred_testlabel:
+        file.write(str(pred[0])+" "+str(pred[1])+"\r\n")
+    file.close()
     num = len(testlabel)
     accuracy = len([1 for i in range(num) if testlabel[i]==np.argmax(pred_testlabel[i])])/float(num)
     print(" Origin_model Accuracy:",accuracy)

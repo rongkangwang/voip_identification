@@ -147,12 +147,12 @@ if __name__=='__main__':
     random.shuffle(index)
     data = data[index]
     label = label[index]
-    (X_train, X_val) = (data[0:6000], data[6000:])
-    (Y_train, Y_val) = (label[0:6000], label[6000:])
+    (X_train, X_val) = (data[0:6000], data[6000:8000])
+    (Y_train, Y_val) = (label[0:6000], label[6000:8000])
 
     # 使用early stopping返回最佳epoch对应的model
     early_stopping = EarlyStopping(monitor='val_loss', patience=1)
     model.fit(X_train, Y_train, batch_size=100, validation_data=(X_val, Y_val), epochs=5, callbacks=[early_stopping])
     json_string = model.to_json()
-    open('googlenet_architecture_112.json', 'w').write(json_string)
-    model.save_weights('googlenet_weights_112.h5')
+    open('googlenet_architecture_10.json', 'w').write(json_string)
+    model.save_weights('googlenet_weights_10.h5')
