@@ -9,8 +9,8 @@ series_threshold = 2.0/3.0
 series_pktnum = 15
 column = 1000
 row = 1040
-type = "jumblo"
-pktnum = 10
+type = "xlite"
+pktnum = 56
 
 def pcap2packetspayload(filename):
     fpcap = open(filename, 'rb')
