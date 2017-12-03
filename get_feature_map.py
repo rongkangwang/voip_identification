@@ -11,8 +11,8 @@ File: get_feature_map.py
 keras的API已经发生变化，现在可视化特征图可以直接调用接口，具体请参考：http://keras.io/visualization/
 """
 from __future__ import print_function
-import cPickle,theano
-from data import load_data
+# import cPickle,theano
+from data_voip import load_data
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from keras.models import model_from_json
@@ -20,8 +20,8 @@ import numpy as np
 
 #load the saved model
 #model = cPickle.load(open("model.pkl","rb"))
-model = model_from_json(open("my_model_architecture.json").read())
-model.load_weights("my_model_weights.h5")
+model = model_from_json(open("cnn_model_architecture_224.json").read())
+model.load_weights("cnn_model_weights_224.h5")
 
 #define theano funtion to get output of  FC layer
 #get_feature = theano.function([model.layers[0].input],model.layers[11].output,allow_input_downcast=False) 
@@ -29,11 +29,10 @@ model.load_weights("my_model_weights.h5")
 #define theano funtion to get output of  first Conv layer 
 #get_featuremap = theano.function([model.layers[0].input],model.layers[2].output,allow_input_downcast=False) 
 from keras import backend as K
-get_feature = K.function([model.layers[0].input],[model.layers[10].output])
+get_feature = K.function([model.layers[0].input],[model.layers[-1].output])
 get_featuremap = K.function([model.layers[0].input],[model.layers[1].output])
 
 data, label = load_data()
-data = data.reshape(data.shape[0], 28, 28, 1)  
 # visualize feature  of  Fully Connected layer
 #data[0:10] contains 10 images
 

@@ -8,7 +8,7 @@ from keras.utils import plot_model
 # from KerasLayers.Custom_layers import LRN2D
 
 # Global Constants
-NB_CLASS = 2
+NB_CLASS = 5
 LEARNING_RATE=0.01
 MOMENTUM=0.9
 ALPHA=0.0001
@@ -139,20 +139,20 @@ if __name__=='__main__':
 
     x, img_input, CONCAT_AXIS, INP_SHAPE, DATA_FORMAT = create_model()
     model = Model(input=img_input, output=[x])
-    sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+    sgd = SGD(lr=0.001, decay=0.01, momentum=0.9, nesterov=True)
     # sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
-    model.compile(loss='categorical_crossentropy', optimizer=sgd)
+    model.compile(loss='categorical_crossentropy', optimizer=sgd,metrics=['accuracy'])
 
     index = [i for i in range(len(data))]
     random.shuffle(index)
     data = data[index]
     label = label[index]
-    (X_train, X_val) = (data[0:6000], data[6000:8000])
-    (Y_train, Y_val) = (label[0:6000], label[6000:8000])
+    (X_train, X_val) = (data[0:12000], data[12000:])
+    (Y_train, Y_val) = (label[0:12000], label[12000:])
 
     # 使用early stopping返回最佳epoch对应的model
     early_stopping = EarlyStopping(monitor='val_loss', patience=1)
-    model.fit(X_train, Y_train, batch_size=100, validation_data=(X_val, Y_val), epochs=5, callbacks=[early_stopping])
+    model.fit(X_train, Y_train, batch_size=100, validation_data=(X_val, Y_val), epochs=10, callbacks=[early_stopping])
     json_string = model.to_json()
-    open('googlenet_architecture_10.json', 'w').write(json_string)
-    model.save_weights('googlenet_weights_10.h5')
+    open('googlenet_architecture_224.json', 'w').write(json_string)
+    model.save_weights('googlenet_weights_224.h5')

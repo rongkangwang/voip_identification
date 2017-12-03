@@ -66,7 +66,7 @@ def create_model():
 ##############
 model = create_model()
 sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-model.compile(loss='categorical_crossentropy', optimizer=sgd)
+model.compile(loss='categorical_crossentropy', optimizer=sgd,metrics=['accuracy'])
 
 index = [i for i in range(len(data))]
 random.shuffle(index)
