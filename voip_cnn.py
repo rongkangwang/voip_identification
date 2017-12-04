@@ -16,7 +16,9 @@ from keras.callbacks import EarlyStopping
 import numpy as np
 
 np.random.seed(1024)  # for reproducibility
-image_shape = (224,224,1)
+rows_default = 100
+cols_default = 256
+image_shape = (rows_default,cols_default,1)
 
 
 #加载数据
@@ -24,7 +26,7 @@ data, label = load_data()
 
 
 #label为0~9共10个类别，keras要求形式为binary class matrices,转化一下，直接调用keras提供的这个函数
-nb_class = 5
+nb_class = 4
 label = np_utils.to_categorical(label, nb_class)
 
 
@@ -68,6 +70,6 @@ label = label[index]
 early_stopping = EarlyStopping(monitor='val_loss', patience=1)
 model.fit(X_train, Y_train, batch_size=100,validation_data=(X_val, Y_val),epochs=3,callbacks=[early_stopping])
 json_string = model.to_json()
-open('cnn_model_architecture_224.json','w').write(json_string)
-model.save_weights('cnn_model_weights_224.h5')
+open('cnn_model_architecture_100.json','w').write(json_string)
+model.save_weights('cnn_model_weights_100.h5')
 #cPickle.dump(model,open("./model.pkl","wb"))

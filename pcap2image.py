@@ -9,8 +9,10 @@ series_threshold = 2.0/3.0
 series_pktnum = 15
 column = 1000
 row = 1040
-type = "xlite"
+type = "zoiper"
 pktnum = 224
+rows_default = 100
+cols_default = 256
 
 def pcap2packetspayload(filename):
     fpcap = open(filename, 'rb')
@@ -348,6 +350,21 @@ def transferpacket2matrix224(packet,max_len=224):
         m[i] = a_num
     return m
 
+def transferpacket2matrixbycols(packet,cols):
+    p_len = len(packet)
+
+    m = np.zeros(cols,dtype="float32")
+    # for i in range(max_len):
+    #     m[i] = 255
+    if p_len>cols:
+        p_len = cols
+    for i in range(p_len):
+        pc = packet[i]
+        a_num = struct.unpack('B', pc)[0]
+        # m[i] = 255-a_num
+        m[i] = a_num
+    return m
+
 def get224imgwithpktheader(packets):
     pkts = []
     for packet in packets:
@@ -423,6 +440,29 @@ def get224img(packets):
         imsave("../data/"+str(pktnum)+"/"+type+"/"+type+str(imagecount)+".png", im)
         imagecount = imagecount+1
 
+def getimgbydims(pkts,rows=256,cols=256):
+    global imagecount
+    udplen = len(pkts)
+    num = udplen/rows
+    print num
+    for i in range(num):
+        ps = pkts[0+i*rows:(rows-1)+i*rows]
+        m = np.zeros((rows, cols), dtype="float32")
+        for j in range(len(ps)):
+            p = ps[j]
+            m[j] = transferpacket2matrixbycols(p,cols)
+        # plt.imshow(m, cmap=cm.Greys_r)
+        # plt.savefig("../data/224/"+type+"/"+type+str(imagecount)+".png")
+        im = np.array(m)
+        im = im.reshape(rows, cols)
+        from scipy.misc import imsave
+        # from matplotlib.pyplot import imsave
+        basepath = "../data/"+str(rows)+"/"+type
+        if(not os.path.exists(basepath)):
+            os.makedirs(basepath)
+        imsave(basepath+"/"+type+str(imagecount)+".png", im)
+        imagecount = imagecount+1
+
 imagecount = 1
 
 if __name__=="__main__":
@@ -448,7 +488,7 @@ if __name__=="__main__":
             #skypepcap2img(filename)
             # payload only()udp
             (packets_init, max_len) = pcap2packetspayload(filename)
-            get224imgpayload(packets_init)
+            getimgbydims(packets_init,rows=rows_default,cols=cols_default)
     # (start,end) = getvoicestartandend(packets_init)
     # print (start,end)
     # m = getfinalmatrix(packets_init,start,end)
