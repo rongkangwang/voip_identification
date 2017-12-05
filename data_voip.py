@@ -17,11 +17,11 @@ def load_data():
     d = []
     l = []
     for di in os.listdir(filepath):
-        if(di=="skype" or di=="jumblo" or di=="uu" or di=="xlite" or di=="zoiper"):
+        if(di=="skype" or di=="jumblo" or di=="uu" or di=="xlite" or di=="zoiper" or di=="kc" or di=="alt"):
             voipdir = os.path.join(filepath,di)
             for i in os.listdir(voipdir):
                 if(i.__contains__(".png")):
-                    if(pnum>=1000):
+                    if(pnum>=2000):
                         pnum = 0
                         break
                     img = Image.open(os.path.join(voipdir,i))
@@ -39,6 +39,10 @@ def load_data():
                         l.append(3)
                     elif (di == "uu"):
                         l.append(4)
+                    elif (di == "alt"):
+                        l.append(5)
+                    elif (di == "kc"):
+                        l.append(6)
     data = np.asarray(d,dtype="float32")
     label = np.asarray(l,dtype="float32")
     data /= np.max(data)
