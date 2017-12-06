@@ -26,7 +26,7 @@ data, label = load_data()
 
 
 #label为0~9共10个类别，keras要求形式为binary class matrices,转化一下，直接调用keras提供的这个函数
-nb_class = 4
+nb_class = 5
 label = np_utils.to_categorical(label, nb_class)
 
 
