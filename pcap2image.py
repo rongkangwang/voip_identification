@@ -9,7 +9,7 @@ series_threshold = 2.0/3.0
 series_pktnum = 15
 column = 1000
 row = 1040
-type = "skype"
+type = "kc"
 pktnum = 224
 rows_default = 100
 cols_default = 256
@@ -465,6 +465,16 @@ def getimgbydims(pkts,rows=256,cols=256):
 
 imagecount = 1
 
+def shufflepackets(packets):
+    import random
+    index = [i for i in range(len(packets))]
+    random.shuffle(index)
+    # packets = packets[index]
+    pkts = []
+    for i in index:
+        pkts.append(packets[i])
+    return pkts
+
 if __name__=="__main__":
     # if(platform.uname()[0]=="Linux"):
     #     filename = "/home/kang/Documents/data/"+type+"/"+type+"_voice.pcap"
@@ -488,7 +498,9 @@ if __name__=="__main__":
             #skypepcap2img(filename)
             # payload only()udp
             (packets_init, max_len) = pcap2packetspayload(filename)
-            getimgbydims(packets_init,rows=rows_default,cols=cols_default)
+            for i in range(200):
+                getimgbydims(packets_init,rows=rows_default,cols=cols_default)
+                packets_init = shufflepackets(packets_init)
     # (start,end) = getvoicestartandend(packets_init)
     # print (start,end)
     # m = getfinalmatrix(packets_init,start,end)

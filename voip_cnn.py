@@ -26,7 +26,7 @@ data, label = load_data()
 
 
 #label为0~9共10个类别，keras要求形式为binary class matrices,转化一下，直接调用keras提供的这个函数
-nb_class = 5
+nb_class = 7
 label = np_utils.to_categorical(label, nb_class)
 
 
@@ -68,7 +68,7 @@ label = label[index]
 
 #使用early stopping返回最佳epoch对应的model
 early_stopping = EarlyStopping(monitor='val_loss', patience=1)
-model.fit(X_train, Y_train, batch_size=100,validation_data=(X_val, Y_val),epochs=3,callbacks=[early_stopping])
+model.fit(X_train, Y_train, batch_size=100,validation_data=(X_val, Y_val),epochs=5,callbacks=[early_stopping])
 json_string = model.to_json()
 open('cnn_model_architecture_100.json','w').write(json_string)
 model.save_weights('cnn_model_weights_100.h5')

@@ -14,9 +14,9 @@ from keras.callbacks import EarlyStopping
 import numpy as np
 
 np.random.seed(1024)  # for reproducibility
-input_shape = (100,224,1)
+input_shape = (100,256,1)
 
-nb_class = 5
+nb_class = 7
 
 def create_alexnet_model():
 	model = Sequential()
@@ -81,7 +81,7 @@ def train():
 	label = np_utils.to_categorical(label, nb_class)
 
 	model = create_alexnet_model()
-	sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+	sgd = SGD(lr=0.001, decay=1e-6, momentum=0.9, nesterov=True)
 	model.compile(loss='categorical_crossentropy', optimizer=sgd,metrics=['accuracy'])
 
 	index = [i for i in range(len(data))]
@@ -93,7 +93,7 @@ def train():
 
 	#使用early stopping返回最佳epoch对应的model
 	early_stopping = EarlyStopping(monitor='val_loss', patience=1)
-	model.fit(X_train, Y_train, batch_size=100,validation_data=(X_val, Y_val),epochs=3,callbacks=[early_stopping])
+	model.fit(X_train, Y_train, batch_size=100,validation_data=(X_val, Y_val),epochs=5,callbacks=[early_stopping])
 	json_string = model.to_json()
 	open('alexnet_model_architecture_100.json','w').write(json_string)
 	model.save_weights('alexnet_model_weights_100.h5')
