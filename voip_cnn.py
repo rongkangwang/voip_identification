@@ -56,7 +56,7 @@ def create_model():
 #开始训练模型
 ##############
 model = create_model()
-sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+sgd = SGD(lr=0.001, decay=1e-6, momentum=0.9, nesterov=True)
 model.compile(loss='categorical_crossentropy', optimizer=sgd,metrics=['accuracy'])
 
 index = [i for i in range(len(data))]
@@ -66,9 +66,9 @@ label = label[index]
 (X_train,X_val) = (data[0:12000],data[12000:])
 (Y_train,Y_val) = (label[0:12000],label[12000:])
 
-#使用early stopping返回最佳epoch对应的model
+#使用early stopping返回最佳epoch对应的model 
 early_stopping = EarlyStopping(monitor='val_loss', patience=1)
-model.fit(X_train, Y_train, batch_size=100,validation_data=(X_val, Y_val),epochs=5,callbacks=[early_stopping])
+model.fit(X_train, Y_train, batch_size=100,validation_data=(X_val, Y_val),epochs=10,callbacks=[early_stopping])
 json_string = model.to_json()
 open('cnn_model_architecture_100.json','w').write(json_string)
 model.save_weights('cnn_model_weights_100.h5')

@@ -93,7 +93,7 @@ def train():
 
 	#使用early stopping返回最佳epoch对应的model
 	early_stopping = EarlyStopping(monitor='val_loss', patience=1)
-	model.fit(X_train, Y_train, batch_size=100,validation_data=(X_val, Y_val),epochs=5,callbacks=[early_stopping])
+	model.fit(X_train, Y_train, batch_size=100,validation_data=(X_val, Y_val),epochs=10,callbacks=[early_stopping])
 	json_string = model.to_json()
 	open('alexnet_model_architecture_100.json','w').write(json_string)
 	model.save_weights('alexnet_model_weights_100.h5')
