@@ -112,13 +112,13 @@ import struct
 #
 # print(anp)
 
-# import data_voip
-# import numpy as np
-# from PIL import Image
+import data_voip
+import numpy as np
+from PIL import Image
 
-# (data,label) = data_voip.load_data()
+(data,label) = data_voip.load_data()
 
-# print(np.shape(data))
-# print(np.shape(label))
-for i in range(10):
-	open("test.txt","a+").write("%d\r\n"%(233))
+print(np.shape(data))
+print(np.shape(label))
+# for i in range(10):
+# 	open("test.txt","a+").write("%d\r\n"%(233))

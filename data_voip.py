@@ -21,7 +21,7 @@ def load_data(rows=100):
             voipdir = os.path.join(filepath,di)
             for i in os.listdir(voipdir):
                 if(i.__contains__(".png")):
-                    if(pnum>=2000):
+                    if(pnum>=10000):
                         pnum = 0
                         break
                     img = Image.open(os.path.join(voipdir,i))
