@@ -7,7 +7,7 @@ import platform
 
 rows = 100
 cols = 256
-def load_data():
+def load_data(rows=100):
     if (platform.uname()[0] == "Linux"):
         filepath = "/home/kang/Documents/data/"+str(rows)+"/"
     elif (platform.uname()[0] == "Darwin"):

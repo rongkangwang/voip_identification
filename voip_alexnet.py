@@ -13,12 +13,13 @@ import random,cPickle
 from keras.callbacks import EarlyStopping
 import numpy as np
 
+#rows = 100
 np.random.seed(1024)  # for reproducibility
-input_shape = (100,256,1)
+#input_shape = (rows,256,1)
 
 nb_class = 7
 
-def create_alexnet_model():
+def create_alexnet_model(input_shape=(100,256,1)):
 	model = Sequential()
 	# Conv layer 1 output shape (55, 55, 48)
 	model.add(Conv2D(
@@ -76,11 +77,11 @@ def create_alexnet_model():
 	model.add(Dense(nb_class, activation='softmax'))
 	return model
 
-def train():
-	data, label = load_data()
+def train(rows=100):
+	data, label = load_data(rows)
 	label = np_utils.to_categorical(label, nb_class)
 
-	model = create_alexnet_model()
+	model = create_alexnet_model(input_shape=(rows,256,1))
 	sgd = SGD(lr=0.001, decay=1e-6, momentum=0.9, nesterov=True)
 	model.compile(loss='categorical_crossentropy', optimizer=sgd,metrics=['accuracy'])
 
@@ -95,13 +96,19 @@ def train():
 	early_stopping = EarlyStopping(monitor='val_loss', patience=1)
 	model.fit(X_train, Y_train, batch_size=100,validation_data=(X_val, Y_val),epochs=10,callbacks=[early_stopping])
 	json_string = model.to_json()
-	open('alexnet_model_architecture_100.json','w').write(json_string)
-	model.save_weights('alexnet_model_weights_100.h5')
+	open('../data/model_json/alexnet_model_architecture_'+str(rows)+'.json','w').write(json_string)
+	model.save_weights('../data/model_json/alexnet_model_weights_'+str(rows)+'.h5')
+
+	(x_test,y_test) = (data[0:],label[0:])
+	loss,accuracy = model.evaluate(x_test,y_test)
+	open('../data/model_json/result.txt', 'a+').write("pkt_num:%d, loss:%f, accuracy:%f\r\n"%(rows,loss,accuracy))
 
 def checkprint():
 	model = create_alexnet_model()
 	model.summary()
 
 if __name__=="__main__":
-	train()
-	# checkprint()
+	rs = [30,40,50,60,70,80,90,100,110,120]
+	for rows in rs:
+		train(rows=rows)
+	#checkprint()

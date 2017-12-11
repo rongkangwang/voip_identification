@@ -9,9 +9,11 @@ series_threshold = 2.0/3.0
 series_pktnum = 15
 column = 1000
 row = 1040
-type = "kc"
+#type = "zoiper"
+types = ["xlite","skype","uu","zoiper","jumblo"]
+types_loop = ["kc","alt"]
 pktnum = 224
-rows_default = 100
+rows_default = 120
 cols_default = 256
 
 def pcap2packetspayload(filename):
@@ -480,37 +482,62 @@ if __name__=="__main__":
     #     filename = "/home/kang/Documents/data/"+type+"/"+type+"_voice.pcap"
     # elif(platform.uname()[0] == "Darwin"):
     #     filename = "/Users/kang/Documents/workspace/data/"+type+"/"+type+"_voice.pcap"
-    if (platform.uname()[0] == "Linux"):
-        filepath = "/home/kang/Documents/data/" + type
-    elif (platform.uname()[0] == "Darwin"):
-        filepath = "/Users/kang/Documents/workspace/data/" + type
-    # (packets_init,max_len) = pcap2packetswithpktheader(filename)
-    # get224imgwithpktheader(packets_init)
-    import os
-    for file in os.listdir(filepath):
-        if(file.__contains__(type)):
-            filename = os.path.join(filepath, file)
-            # print(filename)
-            # (packets_init, max_len) = pcap2packets(filename)
-            # get224img(packets_init)
-            # skype payload only
-            #skypepcap2imgpayload(filename)
-            #skypepcap2img(filename)
-            # payload only()udp
-            (packets_init, max_len) = pcap2packetspayload(filename)
-            for i in range(200):
+    for type in types:
+        if (platform.uname()[0] == "Linux"):
+            filepath = "/home/kang/Documents/data/" + type
+        elif (platform.uname()[0] == "Darwin"):
+            filepath = "/Users/kang/Documents/workspace/data/" + type
+        # (packets_init,max_len) = pcap2packetswithpktheader(filename)
+        # get224imgwithpktheader(packets_init)
+        import os
+        for file in os.listdir(filepath):
+            if(file.__contains__(type)):
+                filename = os.path.join(filepath, file)
+                # print(filename)
+                # (packets_init, max_len) = pcap2packets(filename)
+                # get224img(packets_init)
+                # skype payload only
+                #skypepcap2imgpayload(filename)
+                #skypepcap2img(filename)
+                # payload only()udp
+                (packets_init, max_len) = pcap2packetspayload(filename)
                 getimgbydims(packets_init,rows=rows_default,cols=cols_default)
-                packets_init = shufflepackets(packets_init)
-    # (start,end) = getvoicestartandend(packets_init)
-    # print (start,end)
-    # m = getfinalmatrix(packets_init,start,end)
-    # #packets = getfinalpackets(packets_init,start,end)
-    # # for packet in packets:
-    # #     print isudp(packet)
-    # # m = np.zeros((len(packets), max_len), dtype="float32")
-    # # for i in range(len(packets)):
-    # #     p = packets[i]
-    # #     m[i] = transferpacket2matrix(p,max_len)
-    # plt.imshow(m, cmap=cm.Greys_r)
-    # plt.savefig("../data/skype_image/skype_voice.png")
-    # plt.show()
+                # for i in range(200):
+                #     getimgbydims(packets_init,rows=rows_default,cols=cols_default)
+                #     packets_init = shufflepackets(packets_init)
+    for type in types_loop:
+        if (platform.uname()[0] == "Linux"):
+            filepath = "/home/kang/Documents/data/" + type
+        elif (platform.uname()[0] == "Darwin"):
+            filepath = "/Users/kang/Documents/workspace/data/" + type
+        # (packets_init,max_len) = pcap2packetswithpktheader(filename)
+        # get224imgwithpktheader(packets_init)
+        import os
+        for file in os.listdir(filepath):
+            if(file.__contains__(type)):
+                filename = os.path.join(filepath, file)
+                # print(filename)
+                # (packets_init, max_len) = pcap2packets(filename)
+                # get224img(packets_init)
+                # skype payload only
+                #skypepcap2imgpayload(filename)
+                #skypepcap2img(filename)
+                # payload only()udp
+                (packets_init, max_len) = pcap2packetspayload(filename)
+                # getimgbydims(packets_init,rows=rows_default,cols=cols_default)
+                for i in range(200):
+                    getimgbydims(packets_init,rows=rows_default,cols=cols_default)
+                    packets_init = shufflepackets(packets_init)
+        # (start,end) = getvoicestartandend(packets_init)
+        # print (start,end)
+        # m = getfinalmatrix(packets_init,start,end)
+        # #packets = getfinalpackets(packets_init,start,end)
+        # # for packet in packets:
+        # #     print isudp(packet)
+        # # m = np.zeros((len(packets), max_len), dtype="float32")
+        # # for i in range(len(packets)):
+        # #     p = packets[i]
+        # #     m[i] = transferpacket2matrix(p,max_len)
+        # plt.imshow(m, cmap=cm.Greys_r)
+        # plt.savefig("../data/skype_image/skype_voice.png")
+        # plt.show()
