@@ -108,7 +108,7 @@ def checkprint():
 	model.summary()
 
 if __name__=="__main__":
-	rs = [30,40,50,60,70,80,90,100,110,120]
+	rs = [5,10,20,40,60,80,100]
 	for rows in rs:
 		train(rows=rows)
 	#checkprint()
