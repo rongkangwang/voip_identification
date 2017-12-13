@@ -94,7 +94,7 @@ def train(rows=100):
 
 	#使用early stopping返回最佳epoch对应的model
 	early_stopping = EarlyStopping(monitor='val_loss', patience=1)
-	model.fit(X_train, Y_train, batch_size=100,validation_data=(X_val, Y_val),epochs=10,callbacks=[early_stopping])
+	model.fit(X_train, Y_train, batch_size=100,validation_data=(X_val, Y_val),epochs=5,callbacks=[early_stopping])
 	json_string = model.to_json()
 	open('../data/model_json/alexnet_model_architecture_'+str(rows)+'.json','w').write(json_string)
 	model.save_weights('../data/model_json/alexnet_model_weights_'+str(rows)+'.h5')
@@ -104,11 +104,11 @@ def train(rows=100):
 	open('../data/model_json/result.txt', 'a+').write("pkt_num:%d, loss:%f, accuracy:%f\r\n"%(rows,loss,accuracy))
 
 def checkprint():
-	model = create_alexnet_model()
+	model = create_alexnet_model(input_shape=(30,256,1))
 	model.summary()
 
 if __name__=="__main__":
-	rs = [5,10,20,40,60,80,100]
+	rs = [40,60,80,100]
 	for rows in rs:
 		train(rows=rows)
-	#checkprint()
+	# checkprint()b

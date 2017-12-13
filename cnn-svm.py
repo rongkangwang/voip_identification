@@ -4,10 +4,10 @@ Code:https://github.com/wepe
 File: cnn-svm.py
 '''
 from __future__ import print_function
-import cPickle
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.svm import SVC
-from sklearn.preprocessing import MinMaxScaler
+# import cPickle
+# from sklearn.ensemble import RandomForestClassifier
+# from sklearn.svm import SVC
+# from sklearn.preprocessing import MinMaxScaler
 from data_voip import load_data
 import random
 from keras.models import model_from_json
@@ -34,9 +34,11 @@ def rf(traindata,trainlabel,testdata,testlabel):
     accuracy = len([1 for i in range(num) if testlabel[i]==pred_testlabel[i]])/float(num)
     print("cnn-rf Accuracy:",accuracy)
 
+rows = 40
+
 if __name__ == "__main__":
     #load data
-    data, label = load_data()
+    data, label = load_data(rows=rows)
     #shuffle the data
     index = [i for i in range(len(data))]
     random.shuffle(index)
@@ -46,22 +48,22 @@ if __name__ == "__main__":
     # print(data)
     # data = data.reshape(data.shape[0], 28, 28, 1)
 
-    (traindata,testdata) = (data[0:3000],data[3000:15000])
-    (trainlabel,testlabel) = (label[0:3000],label[3000:15000])
+    (traindata,testdata) = (data[0:0],data[0:])
+    (trainlabel,testlabel) = (label[0:0],label[0:])
     # traindata = traindata.reshape(traindata.shape[0], 28, 28, 1)
     # testdata = testdata.reshape(testdata.shape[0], 28, 28, 1)
 
     # use origin_model to predict testdata
     # origin_model = cPickle.load(open("model.pkl","rb"))
-    origin_model = model_from_json(open("cnn_model_architecture_224.json").read())
-    origin_model.load_weights("cnn_model_weights_224.h5")
+    origin_model = model_from_json(open("../data/model_json/alexnet_model_architecture_"+str(rows)+".json").read())
+    origin_model.load_weights("../data/model_json/alexnet_model_weights_"+str(rows)+".h5")
     # origin_model = tf2th(origin_model)
     #print(origin_model.layers)
     pred_testlabel = origin_model.predict(testdata,batch_size=1, verbose=1)
     print(pred_testlabel)
-    file = open('cnn_pred_testlabel_224', 'w')
+    file = open('../data/model_json/alexnet_pred_testlabel_'+str(rows), 'w')
     for pred in pred_testlabel:
-        file.write(str(pred[0])+" "+str(pred[1])+" "+str(pred[2])+" "+str(pred[3])+" "+str(pred[4])+"\r\n")
+        file.write(str(pred[0])+" "+str(pred[1])+" "+str(pred[2])+" "+str(pred[3])+" "+str(pred[4])+" "+str(pred[5])+" "+str(pred[6])+"\r\n")
     file.close()
     num = len(testlabel)
     accuracy = len([1 for i in range(num) if testlabel[i]==np.argmax(pred_testlabel[i])])/float(num)
