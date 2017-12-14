@@ -8,7 +8,7 @@ from keras.utils import plot_model
 # from KerasLayers.Custom_layers import LRN2D
 
 # Global Constants
-NB_CLASS = 5
+NB_CLASS = 7
 LEARNING_RATE=0.01
 MOMENTUM=0.9
 ALPHA=0.0001
@@ -62,7 +62,7 @@ def inception_module(x,params,concat_axis,padding='same',data_format=DATA_FORMAT
 
 
 
-def create_model():
+def create_model(input_shape=(100,256,1)):
     # if DATA_FORMAT=='channels_first':
     #     INP_SHAPE=(3,224,224)
     #     img_input=Input(shape=INP_SHAPE)
@@ -74,7 +74,7 @@ def create_model():
     # else:
     #     raise Exception('Invalid Dim Ordering: '+str(DIM_ORDERING))
 
-    INP_SHAPE = (224, 224, 1)
+    INP_SHAPE = input_shape
     img_input = Input(shape=INP_SHAPE)
     CONCAT_AXIS = 3
 
@@ -112,7 +112,7 @@ def create_model():
 
 def check_print():
     # Create the Model
-    x,img_input,CONCAT_AXIS,INP_SHAPE,DATA_FORMAT=create_model()
+    x,img_input,CONCAT_AXIS,INP_SHAPE,DATA_FORMAT=create_model(input_shape=(5,256,1))
 
     # Create a Keras Model
     model=Model(input=img_input,output=[x])
@@ -124,22 +124,20 @@ def check_print():
     # model.compile(optimizer='rmsprop',loss='categorical_crossentropy')
     print 'Model Compiled'
 
-
-if __name__=='__main__':
-    # check_print()
+def train(rows=100):
     from data_voip import load_data
     from keras.utils import np_utils, generic_utils
     from keras.optimizers import SGD
     import random, cPickle
     from keras.callbacks import EarlyStopping
 
-    data, label = load_data()
+    data, label = load_data(rows=rows)
 
     label = np_utils.to_categorical(label, NB_CLASS)
 
-    x, img_input, CONCAT_AXIS, INP_SHAPE, DATA_FORMAT = create_model()
+    x, img_input, CONCAT_AXIS, INP_SHAPE, DATA_FORMAT = create_model(input_shape=(rows,256,1))
     model = Model(input=img_input, output=[x])
-    sgd = SGD(lr=0.001, decay=0.01, momentum=0.9, nesterov=True)
+    sgd = SGD(lr=0.001, decay=1e-6, momentum=0.9, nesterov=True)
     # sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
     model.compile(loss='categorical_crossentropy', optimizer=sgd,metrics=['accuracy'])
 
@@ -147,12 +145,24 @@ if __name__=='__main__':
     random.shuffle(index)
     data = data[index]
     label = label[index]
-    (X_train, X_val) = (data[0:12000], data[12000:])
-    (Y_train, Y_val) = (label[0:12000], label[12000:])
+    (X_train, X_val) = (data[0:55000], data[55000:])
+    (Y_train, Y_val) = (label[0:55000], label[55000:])
 
     # 使用early stopping返回最佳epoch对应的model
     early_stopping = EarlyStopping(monitor='val_loss', patience=1)
     model.fit(X_train, Y_train, batch_size=100, validation_data=(X_val, Y_val), epochs=10, callbacks=[early_stopping])
     json_string = model.to_json()
-    open('googlenet_architecture_224.json', 'w').write(json_string)
-    model.save_weights('googlenet_weights_224.h5')
+    open('../data/model_json/googlenet_model_architecture_'+str(rows)+'.json','w').write(json_string)
+    model.save_weights('../data/model_json/googlenet_model_weights_'+str(rows)+'.h5')
+    
+    (x_test,y_test) = (data[0:],label[0:])
+    loss,accuracy = model.evaluate(x_test,y_test)
+    open('../data/model_json/googlenet_result.txt', 'a+').write("pkt_num:%d, loss:%f, accuracy:%f\r\n"%(rows,loss,accuracy))
+
+
+if __name__=='__main__':
+    # check_print()
+    rs = [5,10,20,40,60,80,100]
+    for rows in rs:
+        train(rows=rows)
+    
