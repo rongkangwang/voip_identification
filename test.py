@@ -116,7 +116,7 @@ import data_voip
 import numpy as np
 from PIL import Image
 
-(data,label) = data_voip.load_data()
+(data,label) = data_voip.load_data(rows=2)
 
 print(np.shape(data))
 print(np.shape(label))

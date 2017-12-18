@@ -112,7 +112,7 @@ def create_model(input_shape=(100,256,1)):
 
 def check_print():
     # Create the Model
-    x,img_input,CONCAT_AXIS,INP_SHAPE,DATA_FORMAT=create_model(input_shape=(5,256,1))
+    x,img_input,CONCAT_AXIS,INP_SHAPE,DATA_FORMAT=create_model(input_shape=(1,256,1))
 
     # Create a Keras Model
     model=Model(input=img_input,output=[x])
@@ -162,7 +162,7 @@ def train(rows=100):
 
 if __name__=='__main__':
     # check_print()
-    rs = [5,10,20,40,60,80,100]
+    rs = [2]
     for rows in rs:
         train(rows=rows)
     

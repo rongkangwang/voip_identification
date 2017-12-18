@@ -448,6 +448,8 @@ def getimgbydims(pkts,rows=256,cols=256):
     num = udplen/rows
     print num
     for i in range(num):
+        if imagecount>10000:
+            break
         ps = pkts[0+i*rows:(rows-1)+i*rows]
         m = np.zeros((rows, cols), dtype="float32")
         for j in range(len(ps)):
@@ -478,7 +480,7 @@ def shufflepackets(packets):
     return pkts
 
 if __name__=="__main__":
-    for rows_default in [5,10,20]:
+    for rows_default in [2]:
         for type in types:
             imagecount = 1
             if (platform.uname()[0] == "Linux"):
@@ -508,6 +510,6 @@ if __name__=="__main__":
                     filename = os.path.join(filepath, file)
                     (packets_init, max_len) = pcap2packetspayload(filename)
                     # getimgbydims(packets_init,rows=rows_default,cols=cols_default)
-                    for i in range(100):
+                    for i in range(50):
                         getimgbydims(packets_init,rows=rows_default,cols=cols_default)
                         packets_init = shufflepackets(packets_init)

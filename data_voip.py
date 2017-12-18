@@ -18,17 +18,14 @@ def load_data(rows=100):
     l = []
     for di in os.listdir(filepath):
         if(di=="skype" or di=="jumblo" or di=="uu" or di=="xlite" or di=="zoiper" or di=="kc" or di=="alt"):
+            # print di
             voipdir = os.path.join(filepath,di)
             for i in os.listdir(voipdir):
                 if(i.__contains__(".png")):
-                    if(pnum>=10000):
-                        pnum = 0
-                        break
                     img = Image.open(os.path.join(voipdir,i))
                     arr = np.asarray(img,dtype="float32")
                     arr = arr.reshape(rows, cols, 1)
                     d.append(arr)
-                    pnum = pnum+1
                     if(di=="skype"):
                         l.append(0)
                     elif(di=="jumblo"):
@@ -43,6 +40,11 @@ def load_data(rows=100):
                         l.append(5)
                     elif (di == "kc"):
                         l.append(6)
+                    pnum = pnum+1
+                    if(pnum>=10000):
+                        print pnum
+                        pnum = 0
+                        break
     data = np.asarray(d,dtype="float32")
     label = np.asarray(l,dtype="float32")
     data /= np.max(data)
