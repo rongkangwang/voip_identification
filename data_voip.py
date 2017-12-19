@@ -19,6 +19,7 @@ def load_data(rows=100):
     for di in os.listdir(filepath):
         if(di=="skype" or di=="jumblo" or di=="uu" or di=="xlite" or di=="zoiper" or di=="kc" or di=="alt"):
             # print di
+            pnum = 0
             voipdir = os.path.join(filepath,di)
             for i in os.listdir(voipdir):
                 if(i.__contains__(".png")):
@@ -41,12 +42,13 @@ def load_data(rows=100):
                     elif (di == "kc"):
                         l.append(6)
                     pnum = pnum+1
-                    if(pnum>=10000):
+                    if(pnum>=30000):
                         print pnum
                         pnum = 0
                         break
     data = np.asarray(d,dtype="float32")
     label = np.asarray(l,dtype="float32")
+    data += 1
     data /= np.max(data)
     data -= np.mean(data)
     return data,label

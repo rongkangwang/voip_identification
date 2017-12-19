@@ -448,7 +448,7 @@ def getimgbydims(pkts,rows=256,cols=256):
     num = udplen/rows
     print num
     for i in range(num):
-        if imagecount>10000:
+        if imagecount>30000:
             break
         ps = pkts[0+i*rows:(rows-1)+i*rows]
         m = np.zeros((rows, cols), dtype="float32")
@@ -480,7 +480,7 @@ def shufflepackets(packets):
     return pkts
 
 if __name__=="__main__":
-    for rows_default in [2]:
+    for rows_default in [1]:
         for type in types:
             imagecount = 1
             if (platform.uname()[0] == "Linux"):

@@ -145,8 +145,8 @@ def train(rows=100):
     random.shuffle(index)
     data = data[index]
     label = label[index]
-    (X_train, X_val) = (data[0:55000], data[55000:])
-    (Y_train, Y_val) = (label[0:55000], label[55000:])
+    (X_train, X_val) = (data[0:170000], data[170000:])
+    (Y_train, Y_val) = (label[0:170000], label[170000:])
 
     # 使用early stopping返回最佳epoch对应的model
     early_stopping = EarlyStopping(monitor='val_loss', patience=1)
@@ -162,7 +162,7 @@ def train(rows=100):
 
 if __name__=='__main__':
     # check_print()
-    rs = [2]
+    rs = [1]
     for rows in rs:
         train(rows=rows)
     
