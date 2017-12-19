@@ -22,21 +22,36 @@ nb_class = 7
 def create_alexnet_model(input_shape=(100,256,1)):
 	model = Sequential()
 	# Conv layer 1 output shape (55, 55, 48)
+	# model.add(Conv2D(
+	#     kernel_size=(11, 11), 
+	#     data_format="channels_last", 
+	#     activation="relu",
+	#     filters=48, 
+	#     strides=(4, 4), 
+	#     input_shape=input_shape
+	# ))
 	model.add(Conv2D(
-	    kernel_size=(11, 11), 
+	    kernel_size=(7, 7), 
 	    data_format="channels_last", 
 	    activation="relu",
 	    filters=48, 
-	    strides=(4, 4), 
+	    strides=(2, 2), 
 	    input_shape=input_shape
 	))
 	model.add(Dropout(0.25))
 	# Conv layer 2 output shape (27, 27, 128)
+	# model.add(Conv2D(
+	#     strides=(2, 2), 
+	#     kernel_size=(5, 5), 
+	#     activation="relu", 
+	#     filters=128
+	# ))
 	model.add(Conv2D(
 	    strides=(2, 2), 
 	    kernel_size=(5, 5), 
 	    activation="relu", 
-	    filters=128
+	    filters=128,
+	    padding="same"
 	))
 	model.add(Dropout(0.25))
 	# Conv layer 3 output shape (13, 13, 192)
@@ -89,8 +104,8 @@ def train(rows=100):
 	random.shuffle(index)
 	data = data[index]
 	label = label[index]
-	(X_train,X_val) = (data[0:55000],data[55000:])
-	(Y_train,Y_val) = (label[0:55000],label[55000:])
+	(X_train,X_val) = (data[0:12000],data[12000:])
+	(Y_train,Y_val) = (label[0:12000],label[12000:])
 
 	#使用early stopping返回最佳epoch对应的model
 	early_stopping = EarlyStopping(monitor='val_loss', patience=1)
@@ -103,12 +118,12 @@ def train(rows=100):
 	loss,accuracy = model.evaluate(x_test,y_test)
 	open('../data/model_json/result.txt', 'a+').write("pkt_num:%d, loss:%f, accuracy:%f\r\n"%(rows,loss,accuracy))
 
-def checkprint():
-	model = create_alexnet_model(input_shape=(30,256,1))
+def checkprint(rows=100):
+	model = create_alexnet_model(input_shape=(rows,256,1))
 	model.summary()
 
 if __name__=="__main__":
-	rs = [40,60,80,100]
+	rs = [10,20,40,60,80,100]
 	for rows in rs:
 		train(rows=rows)
-	# checkprint()b
+	# checkprint(rows=10)
