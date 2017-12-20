@@ -42,13 +42,13 @@ def load_data(rows=100):
                     elif (di == "kc"):
                         l.append(6)
                     pnum = pnum+1
-                    if(pnum>=30000):
+                    if(pnum>=2000):
                         print pnum
                         pnum = 0
                         break
     data = np.asarray(d,dtype="float32")
     label = np.asarray(l,dtype="float32")
-    data += 1
+    # data += 1
     data /= np.max(data)
     data -= np.mean(data)
     return data,label

@@ -93,6 +93,64 @@ def create_alexnet_model(input_shape=(100,256,1)):
 	model.add(Dense(nb_class, activation='softmax'))
 	return model
 
+def create_alexnet_model_original(input_shape=(100,256,1)):
+	model = Sequential()
+	# Conv layer 1 output shape (55, 55, 48)
+	model.add(Conv2D(
+	    kernel_size=(11, 11), 
+	    data_format="channels_last", 
+	    activation="relu",
+	    filters=48, 
+	    strides=(4, 4), 
+	    input_shape=input_shape
+	))
+	model.add(Dropout(0.25))
+	# Conv layer 2 output shape (27, 27, 128)
+	model.add(Conv2D(
+	    strides=(2, 2), 
+	    kernel_size=(5, 5), 
+	    activation="relu", 
+	    filters=128
+	))
+	model.add(Dropout(0.25))
+	# Conv layer 3 output shape (13, 13, 192)
+	model.add(Conv2D(
+	    kernel_size=(3, 3),
+	    activation="relu", 
+	    filters=192,
+	    padding="same",
+	    strides=(1, 1)
+	))
+	model.add(Dropout(0.25))
+	# Conv layer 4 output shape (13, 13, 192)
+	model.add(Conv2D(
+	    padding="same", 
+	    activation="relu",
+	    kernel_size=(3, 3),
+	    filters=192
+	))
+	model.add(Dropout(0.25))
+	# Conv layer 5 output shape (128, 13, 13)
+	model.add(Conv2D(
+	    padding="same",
+	    activation="relu", 
+	    kernel_size=(3, 3),
+	    filters=128
+	))
+	model.add(Dropout(0.25))
+	# fully connected layer 1
+	model.add(Flatten())
+	model.add(Dense(2048, activation='relu'))
+	model.add(Dropout(0.25))
+
+	# fully connected layer 2
+	model.add(Dense(2048, activation='relu'))
+	model.add(Dropout(0.25))
+
+	# output
+	model.add(Dense(nb_class, activation='softmax'))
+	return model
+
 def train(rows=100):
 	data, label = load_data(rows)
 	label = np_utils.to_categorical(label, nb_class)
@@ -124,7 +182,7 @@ def checkprint(rows=100):
 	model.summary()
 
 if __name__=="__main__":
-	# rs = [10,20,40,60,80,100]
+	# rs = [40]
 	# for rows in rs:
 	# 	train(rows=rows)
 	checkprint(rows=40)
