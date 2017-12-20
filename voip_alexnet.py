@@ -182,7 +182,7 @@ def checkprint(rows=100):
 	model.summary()
 
 if __name__=="__main__":
-	rs = [40]
-	for rows in rs:
-		train(rows=rows)
-	# checkprint(rows=40)
+	# rs = [40]
+	# for rows in rs:
+	# 	train(rows=rows)
+	checkprint(rows=100)
