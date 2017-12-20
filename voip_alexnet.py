@@ -104,12 +104,12 @@ def train(rows=100):
 	random.shuffle(index)
 	data = data[index]
 	label = label[index]
-	(X_train,X_val) = (data[0:12000],data[12000:])
-	(Y_train,Y_val) = (label[0:12000],label[12000:])
+	(X_train,X_val) = (data[0:80000],data[80000:])
+	(Y_train,Y_val) = (label[0:80000],label[80000:])
 
 	#使用early stopping返回最佳epoch对应的model
 	early_stopping = EarlyStopping(monitor='val_loss', patience=1)
-	model.fit(X_train, Y_train, batch_size=100,validation_data=(X_val, Y_val),epochs=5,callbacks=[early_stopping])
+	model.fit(X_train, Y_train, batch_size=100,validation_data=(X_val, Y_val),epochs=10,callbacks=[early_stopping])
 	json_string = model.to_json()
 	open('../data/model_json/alexnet_model_architecture_'+str(rows)+'.json','w').write(json_string)
 	model.save_weights('../data/model_json/alexnet_model_weights_'+str(rows)+'.h5')
