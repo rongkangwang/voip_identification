@@ -53,6 +53,7 @@ def create_alexnet_model(input_shape=(100,256,1)):
 	    filters=128,
 	    padding="same"
 	))
+	# model.add(MaxPooling2D(pool_size=(2, 2)))
 	model.add(Dropout(0.25))
 	# Conv layer 3 output shape (13, 13, 192)
 	model.add(Conv2D(
@@ -62,7 +63,6 @@ def create_alexnet_model(input_shape=(100,256,1)):
 	    padding="same",
 	    strides=(1, 1)
 	))
-	model.add(MaxPooling2D(pool_size=(2, 2)))
 	model.add(Dropout(0.25))
 	# Conv layer 4 output shape (13, 13, 192)
 	model.add(Conv2D(
@@ -156,7 +156,7 @@ def train(rows=100):
 	label = np_utils.to_categorical(label, nb_class)
 
 	model = create_alexnet_model(input_shape=(rows,256,1))
-	sgd = SGD(lr=0.001, decay=1e-6, momentum=0.9, nesterov=True)
+	sgd = SGD(lr=0.001, decay=1e-4, momentum=0.9, nesterov=True)
 	model.compile(loss='categorical_crossentropy', optimizer=sgd,metrics=['accuracy'])
 
 	index = [i for i in range(len(data))]
@@ -182,7 +182,7 @@ def checkprint(rows=100):
 	model.summary()
 
 if __name__=="__main__":
-	# rs = [40]
-	# for rows in rs:
-	# 	train(rows=rows)
-	checkprint(rows=100)
+	rs = [40]
+	for rows in rs:
+		train(rows=rows)
+	# checkprint(rows=10)
