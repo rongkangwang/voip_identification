@@ -156,7 +156,7 @@ def train(rows=100):
 	label = np_utils.to_categorical(label, nb_class)
 
 	model = create_alexnet_model(input_shape=(rows,256,1))
-	sgd = SGD(lr=0.001, decay=1e-4, momentum=0.9, nesterov=True)
+	sgd = SGD(lr=0.001, decay=1e-6, momentum=0.9, nesterov=True)
 	model.compile(loss='categorical_crossentropy', optimizer=sgd,metrics=['accuracy'])
 
 	index = [i for i in range(len(data))]
