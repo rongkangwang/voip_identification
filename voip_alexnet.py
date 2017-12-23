@@ -53,6 +53,7 @@ def create_alexnet_model(input_shape=(100,256,1)):
 	    filters=128,
 	    padding="same"
 	))
+	# model.add(MaxPooling2D(pool_size=(2, 2)))
 	model.add(Dropout(0.25))
 	# Conv layer 3 output shape (13, 13, 192)
 	model.add(Conv2D(
@@ -62,7 +63,6 @@ def create_alexnet_model(input_shape=(100,256,1)):
 	    padding="same",
 	    strides=(1, 1)
 	))
-	model.add(MaxPooling2D(pool_size=(2, 2)))
 	model.add(Dropout(0.25))
 	# Conv layer 4 output shape (13, 13, 192)
 	model.add(Conv2D(
@@ -185,4 +185,4 @@ if __name__=="__main__":
 	rs = [10,20]
 	for rows in rs:
 		train(rows=rows)
-	# checkprint(rows=40)
+	# checkprint(rows=10)
