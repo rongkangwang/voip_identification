@@ -53,7 +53,7 @@ def create_alexnet_model(input_shape=(100,256,1)):
 	    filters=128,
 	    padding="same"
 	))
-	# model.add(MaxPooling2D(pool_size=(2, 2)))
+	model.add(MaxPooling2D(pool_size=(2, 2)))
 	model.add(Dropout(0.25))
 	# Conv layer 3 output shape (13, 13, 192)
 	model.add(Conv2D(
@@ -163,8 +163,8 @@ def train(rows=100):
 	random.shuffle(index)
 	data = data[index]
 	label = label[index]
-	(X_train,X_val) = (data[0:12000],data[12000:])
-	(Y_train,Y_val) = (label[0:12000],label[12000:])
+	(X_train,X_val) = (data[0:80000],data[80000:])
+	(Y_train,Y_val) = (label[0:80000],label[80000:])
 
 	#使用early stopping返回最佳epoch对应的model
 	early_stopping = EarlyStopping(monitor='val_loss', patience=1)
@@ -182,7 +182,7 @@ def checkprint(rows=100):
 	model.summary()
 
 if __name__=="__main__":
-	rs = [40]
+	rs = [10,20]
 	for rows in rs:
 		train(rows=rows)
 	# checkprint(rows=10)
