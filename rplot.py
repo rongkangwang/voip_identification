@@ -10,10 +10,10 @@ def acc4voip(rows=100):
 	pred_label = origin_model.predict(data,batch_size=1, verbose=1)
 	num = len(label)
 	voip_len = [0 for i in range(7)]
-	for k in range(1,8):
-		for i in range(num):
-			if label[i]==np.argmax(pred_label[i]):
-				voip_len[label[i]-1] += 1
+	for i in range(num):
+		if label[i]==np.argmax(pred_label[i]):
+			index = label[i].astype(np.int64)-1
+			voip_len[index] += 1
 	voip_acc = [voip_len[i]/(num/7.0) for i in range(7)]
 	print(voip_acc)
 

@@ -122,5 +122,10 @@ import struct
 # print(np.shape(label))
 # for i in range(10):
 # 	open("test.txt","a+").write("%d\r\n"%(233))
-a = [i for i in range(7)]
+import numpy
+a = numpy.empty((10,),dtype="float32")
+for i in range(10):
+	a[i] = i
+b = a[0].astype(numpy.int32)
+print b
 print a 
