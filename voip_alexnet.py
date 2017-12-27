@@ -162,7 +162,7 @@ def train(rows=100):
 	def step_decay(epoch):
 	    initial_lrate = 0.01
 	    drop = 0.5
-	    epochs_drop = 2.0
+	    epochs_drop = 5.0
 	    lrate = initial_lrate * math.pow(drop,math.floor((1+epoch)/epochs_drop))
 	    print(lrate)
 	    return lrate
@@ -175,12 +175,12 @@ def train(rows=100):
 	random.shuffle(index)
 	data = data[index]
 	label = label[index]
-	(X_train,X_val) = (data[0:12000],data[12000:])
-	(Y_train,Y_val) = (label[0:12000],label[12000:])
+	(X_train,X_val) = (data[0:55000],data[55000:])
+	(Y_train,Y_val) = (label[0:55000],label[55000:])
 
 	#使用early stopping返回最佳epoch对应的model
 	early_stopping = EarlyStopping(monitor='val_loss', patience=1)
-	model.fit(X_train, Y_train, batch_size=100,validation_data=(X_val, Y_val),epochs=10,callbacks=[early_stopping,lrate])
+	model.fit(X_train, Y_train, batch_size=100,validation_data=(X_val, Y_val),epochs=20,callbacks=[early_stopping,lrate])
 	json_string = model.to_json()
 	open('../data/model_json/alexnet_model_architecture_'+str(rows)+'.json','w').write(json_string)
 	model.save_weights('../data/model_json/alexnet_model_weights_'+str(rows)+'.h5')

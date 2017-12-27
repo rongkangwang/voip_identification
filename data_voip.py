@@ -42,7 +42,7 @@ def load_data(rows=100):
                     elif (di == "kc"):
                         l.append(6)
                     pnum = pnum+1
-                    if(pnum>=2000):
+                    if(pnum>=10000):
                         print pnum
                         pnum = 0
                         break
