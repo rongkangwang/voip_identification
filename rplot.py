@@ -2,6 +2,7 @@ from data_voip import load_data
 import random
 from keras.models import model_from_json
 import numpy as np
+import matplotlib.pyplot as plt
 
 class plotmodel:
     def __init__(self,rows=100):
@@ -13,11 +14,11 @@ class plotmodel:
         self.data ,self.label = load_data(rows=rows)
         self.pred_label = model.predict(self.data,batch_size=1, verbose=1)
         self.labelnum = len(self.label)
-
+        self.overallacc = self.overallacc()
         
-        self.precision = precision()
-        self.recall = recall()
-        self.fscore = fscore()
+        # self.precision = self.precision()
+        # self.recall = self.recall()
+        # self.fscore = self.fscore()
 
     def overallacc(self):
         accuracy = len([1 for i in range(self.labelnum) if self.label[i]==self.pred_label[i]])/float(self.labelnum)
@@ -77,7 +78,7 @@ class plotmodel:
             else:
                 fp[predict] += 1.0
         voip_fpr = [fp[i]/(fp[i]+tn[i]) for i in range(7)]
-        return fpr
+        return voip_fpr
 
     def far(self):   # Class FAR or class FP rate
         f = [0.0 for i in range(7)]
@@ -95,8 +96,18 @@ class plotmodel:
     def unknowpkt(self):
         return
 
+def drawpicture(pmodel10,pmodel20):
+    x = [10,20]
+    y = [pmodel10.overallacc,pmodel20.overallacc]
+    plt.plot(x,y,".")
+    plt.show()
+
 
 
 
 if __name__=="__main__":
-    pmodel = plotmodel(rows=10)
+    pmodel10 = plotmodel(rows=10)
+    pmodel20 = plotmodel(rows=20)
+    # pmodel40 = plotmodel(rows=40)
+    # pmodel100 = plotmodel(rows=100)
+    drawpicture(pmodel10,pmodel20)

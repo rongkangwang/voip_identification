@@ -123,5 +123,9 @@ import struct
 # for i in range(10):
 # 	open("test.txt","a+").write("%d\r\n"%(233))
 import numpy
-a=[3,2,1]
-print numpy.argmax(a)
+import matplotlib.pyplot as plt
+
+x=np.linspace(0, 5, 100)
+y=x+1
+plt.plot(x,y,".")
+plt.show()
