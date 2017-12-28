@@ -123,9 +123,5 @@ import struct
 # for i in range(10):
 # 	open("test.txt","a+").write("%d\r\n"%(233))
 import numpy
-a = numpy.empty((10,),dtype="float32")
-for i in range(10):
-	a[i] = i
-b = a[0].astype(numpy.int32)
-print b
-print a 
+a=[3,2,1]
+print numpy.argmax(a)
