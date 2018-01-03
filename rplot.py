@@ -127,7 +127,8 @@ def drawpicture(pmodel10,pmodel20,pmodel40,pmodel100):
     plt.ylim(0.0,1.0)  #The ceil
     plt.legend()  
 
-    plt.tight_layout(); 
+    plt.tight_layout()
+    plt.savefig("../result/plot/accbar.eps",format="eps")
     plt.show()
 
 
