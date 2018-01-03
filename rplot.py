@@ -21,7 +21,7 @@ class plotmodel:
         # self.fscore = self.fscore()
 
     def overallacc(self):
-        accuracy = len([1 for i in range(self.labelnum) if self.label[i]==self.pred_label[i]])/float(self.labelnum)
+        accuracy = len([1 for i in range(self.labelnum) if self.label[i]==np.argmax(self.pred_label[i])])/float(self.labelnum)
         return accuracy
 
     def acc4voip(self):   # Class detection rate
@@ -32,7 +32,8 @@ class plotmodel:
                 voip_len[index] += 1
         voip_acc = [voip_len[i] / (self.labelnum / 7.0) for i in range(7)]
         print(voip_acc)
-
+        return voip_acc
+        
     def fprandfnr(self):
 
         return
@@ -96,18 +97,44 @@ class plotmodel:
     def unknowpkt(self):
         return
 
-def drawpicture(pmodel10,pmodel20):
-    x = [10,20]
-    y = [pmodel10.overallacc,pmodel20.overallacc]
+def drawpicture(pmodel10,pmodel20,pmodel40,pmodel100):
+    x = [10,20,40,100]
+    y = [pmodel10.overallacc,pmodel20.overallacc,pmodel40.overallacc,pmodel100.overallacc]
     plt.plot(x,y,".")
+    plt.savefig("../result/plot/overallacc.eps",format="eps")
     plt.show()
 
+    acc10 =  tuple(pmodel10.acc4voip())
+    acc20 =  tuple(pmodel20.acc4voip())
+    acc40 =  tuple(pmodel40.acc4voip())
+    acc100 =  tuple(pmodel100.acc4voip())
+    n_groups = 7
+    index = np.arange(n_groups)  
+    bar_width = 0.15
+    opacity=0.4
+    rects10 = plt.bar(index, acc10, bar_width,alpha=opacity, color='b',label='10')
+    rects20 = plt.bar(index + bar_width, acc20, bar_width,alpha=opacity,color='r',label='20')
+    rects40 = plt.bar(index + 2*bar_width, acc40, bar_width,alpha=opacity, color='y',label='40')
+    rects200 = plt.bar(index + 3*bar_width, acc100, bar_width,alpha=opacity,color='m',label='100')
+
+    # plt.xlabel('Model')  
+    plt.ylabel('Accuracy')  
+    # plt.title('')  
+
+    plt.xticks(index+2*bar_width-0.075,('skype','jumblo','xlite','zoiper','uucall','altcall','kccall'),fontsize=18)
+    plt.yticks(fontsize =18)  #change the num axis size
+
+    plt.ylim(0.0,1.0)  #The ceil
+    plt.legend()  
+
+    plt.tight_layout(); 
+    plt.show()
 
 
 
 if __name__=="__main__":
     pmodel10 = plotmodel(rows=10)
     pmodel20 = plotmodel(rows=20)
-    # pmodel40 = plotmodel(rows=40)
-    # pmodel100 = plotmodel(rows=100)
-    drawpicture(pmodel10,pmodel20)
+    pmodel40 = plotmodel(rows=40)
+    pmodel100 = plotmodel(rows=100)
+    drawpicture(pmodel10,pmodel20,pmodel40,pmodel100)

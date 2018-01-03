@@ -125,7 +125,32 @@ import struct
 import numpy
 import matplotlib.pyplot as plt
 
-x=np.linspace(0, 5, 100)
-y=x+1
-plt.plot(x,y,".")
+a = [1,2,3,4]
+a = tuple(a)
+acc10 =  (1,2,3,4,1,3,2)
+acc20 =  (1,2,3,4,1,3,2)
+acc40 =  (1,2,3,4,1,3,2)
+acc100 =  (1,2,3,4,1,3,2)
+n_groups = 7
+index = np.arange(n_groups)  
+bar_width = 0.15
+opacity=0.4
+rects10 = plt.bar(index, acc10, bar_width,alpha=opacity, color='b',label='10')
+rects20 = plt.bar(index + bar_width, acc20, bar_width,alpha=opacity,color='r',label='20')
+rects40 = plt.bar(index + 2*bar_width, acc40, bar_width,alpha=opacity, color='y',label='40')
+rects200 = plt.bar(index + 3*bar_width, acc100, bar_width,alpha=opacity,color='m',label='100')
+
+plt.xlabel('Category')  
+plt.ylabel('Scores')  
+plt.title('Scores by group and Category')  
+
+plt.xticks(index+2*bar_width-0.075,('balde','bunny','dragon','happy','pillow','1','2'),fontsize=18)
+plt.yticks(fontsize =18)  #change the num axis size
+
+plt.ylim(0,4)  #The ceil
+plt.legend()  
+
+plt.tight_layout(); 
 plt.show()
+print(type(acc10))
+print(type(a))
