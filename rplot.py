@@ -4,16 +4,40 @@ from keras.models import model_from_json
 import numpy as np
 import matplotlib.pyplot as plt
 
+def getpretable(rows=100):
+    model = model_from_json(
+        open("../result/model_json_final/alexnet_model_architecture_" + str(rows) + ".json").read())
+    model.load_weights("../result/model_json_final/alexnet_model_weights_" + str(rows) + ".h5")
+    data ,label = load_data(rows=rows)
+    pred_label = model.predict(data,batch_size=1, verbose=1)
+    print(type(pred_label[0]))
+    file = open('../result/pred/pred_label_'+str(rows), 'w')
+    for pred in pred_label:
+        file.write(str(pred[0])+" "+str(pred[1])+" "+str(pred[2])+" "+str(pred[3])+" "+str(pred[4])+" "+str(pred[5])+" "+str(pred[6])+"\r\n")
+    file.close()
+    file_label = open('../result/pred/label_'+str(rows), 'w')
+    for l in label:
+        file_label.write(str(l)+"\r\n")
+    file_label.close()
+
 class plotmodel:
     def __init__(self,rows=100):
         self.rows = rows
-        model = model_from_json(
-            open("../result/model_json_final/alexnet_model_architecture_" + str(rows) + ".json").read())
-        model.load_weights("../result/model_json_final/alexnet_model_weights_" + str(rows) + ".h5")
-        self.model = model
-        self.data ,self.label = load_data(rows=rows)
-        self.pred_label = model.predict(self.data,batch_size=1, verbose=1)
-        self.labelnum = len(self.label)
+        pred = []
+        file = open('../result/pred/pred_label_'+str(self.rows), 'r')
+        for line in file:
+            label = line.strip().split(" ")
+            #folat_label = np.asarray(label,dtype="float")
+            pred.append(label)
+        self.pred_label = np.asarray(pred,dtype="float")
+        tru = []
+        file = open('../result/pred/label_'+str(self.rows), 'r')
+        for line in file:
+            label = line.strip()
+            tru.append(label)
+        floatlabel = np.asarray(tru,dtype="float")
+        self.label = np.asarray(floatlabel,dtype="int")
+        self.labelnum = len(self.pred_label)
         self.overallacc = self.overallacc()
         
         # self.precision = self.precision()
@@ -134,6 +158,8 @@ def drawpicture(pmodel10,pmodel20,pmodel40,pmodel100):
 
 
 if __name__=="__main__":
+    for row in [10,20,40,100]:
+        getpretable(rows=row)
     pmodel10 = plotmodel(rows=10)
     pmodel20 = plotmodel(rows=20)
     pmodel40 = plotmodel(rows=40)
