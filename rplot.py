@@ -37,8 +37,8 @@ class plotmodel:
             tru.append(label)
         floatlabel = np.asarray(tru,dtype="float")
         self.label = np.asarray(floatlabel,dtype="int")
-        self.cm = self.confusedmatrix()
         self.labelnum = len(self.pred_label)
+        self.cm = self.confusedmatrix()
         self.overallacc = self.overallacc()
         
         # self.precision = self.precision()
@@ -202,6 +202,7 @@ def get100pcap(rows=100,cols=256):
     d = d[0:100]
     l = l[0:100]
     data = np.asarray(d, dtype="float32")
+    data = data.reshape(data.shape[0],rows, cols, 1)
     label = np.asarray(l, dtype="float32")
     data /= np.max(data)
     data -= np.mean(data)
@@ -214,14 +215,14 @@ def getpretable(rows=100):
     data ,label = get100pcap(rows=rows)
     pred_label = model.predict(data,batch_size=1, verbose=1)
     print(type(pred_label[0]))
-    file = open('../result/pred/100pred_label_'+str(rows), 'w')
+    file = open('../result/pred100/100pred_label_'+str(rows), 'w')
     for pred in pred_label:
         file.write(str(pred[0])+" "+str(pred[1])+" "+str(pred[2])+" "+str(pred[3])+" "+str(pred[4])+" "+str(pred[5])+" "+str(pred[6])+"\r\n")
     file.close()
-    file_label = open('../result/pred/100label_'+str(rows), 'w')
-    for l in label:
-        file_label.write(str(l)+"\r\n")
-    file_label.close()
+    # file_label = open('../result/pred/100label_'+str(rows), 'w')
+    # for l in label:
+    #     file_label.write(str(l)+"\r\n")
+    # file_label.close()
 
 if __name__=="__main__":
     # for row in [10,20,40,100]:
@@ -236,3 +237,8 @@ if __name__=="__main__":
     print(pmodel10.precisionbycm())
     print(pmodel10.recall())
     print(pmodel10.recallbycm())
+    # getpretable(rows=10)
+    # getpretable(rows=20)
+    # getpretable(rows=40)
+    # getpretable(rows=100)
+

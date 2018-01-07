@@ -112,14 +112,14 @@ import struct
 #
 # print(anp)
 
-# import data_voip
-# import numpy as np
-# from PIL import Image
+import data_voip
+import numpy as np
+from PIL import Image
 
-# (data,label) = data_voip.load_data(rows=2)
+(data,label) = data_voip.load_data(rows=2)
 
-# print(np.shape(data))
-# print(np.shape(label))
+print(np.shape(data))
+print(np.shape(label))
 # for i in range(10):
 # 	open("test.txt","a+").write("%d\r\n"%(233))
 import numpy
@@ -173,5 +173,5 @@ import matplotlib.pyplot as plt
 # 	print(type(float2_label))
 # m = [ [] for i in range(7) ]
 # print m
-import random
-print (random.randint(10, 100))
+# import random
+# print (random.randint(10, 100))
