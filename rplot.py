@@ -37,12 +37,21 @@ class plotmodel:
             tru.append(label)
         floatlabel = np.asarray(tru,dtype="float")
         self.label = np.asarray(floatlabel,dtype="int")
+        self.cm = self.confusedmatrix()
         self.labelnum = len(self.pred_label)
         self.overallacc = self.overallacc()
         
         # self.precision = self.precision()
         # self.recall = self.recall()
         # self.fscore = self.fscore()
+
+    def confusedmatrix(self):
+        m = [ [ 0 for j in range(7) ] for i in range(7) ]
+        for i in range(self.labelnum):
+            c = np.argmax(self.pred_label[i])
+            r = self.label[i]
+            m[r][c] += 1
+        return m
 
     def overallacc(self):
         accuracy = len([1 for i in range(self.labelnum) if self.label[i]==np.argmax(self.pred_label[i])])/float(self.labelnum)
@@ -77,6 +86,14 @@ class plotmodel:
         print voip_prec
         return voip_prec
 
+    def precisionbycm(self):
+        l = len(self.cm)
+        prec = [0.0 for i in range(l)]
+        for i in range(l):
+            colsum = sum(self.cm[r][i] for r in range(l))
+            prec[i] = float(self.cm[i][i])/colsum
+        return prec
+
     def recall(self):
         tp = [0.0 for i in range(7)]
         fn = [0.0 for i in range(7)]
@@ -90,6 +107,14 @@ class plotmodel:
         voip_recall = [tp[i]/(tp[i]+fn[i]) for i in range(7)]
         print voip_recall
         return voip_recall
+
+    def recallbycm(self):
+        l = len(self.cm)
+        recall = [0.0 for i in range(l)]
+        for i in range(l):
+            rowsum = sum(self.cm[i])
+            recall[i] = float(self.cm[i][i]) / rowsum
+        return recall
 
     def fpr(self):
         fp = [0.0 for i in range(7)]
@@ -155,13 +180,59 @@ def drawpicture(pmodel10,pmodel20,pmodel40,pmodel100):
     plt.savefig("../result/plot/accbar.eps",format="eps")
     plt.show()
 
+def get100pcap(rows=100,cols=256):
+    d = [] # data
+    l = [] # label
 
+    from pcap2image import pcap2packetspayload
+    from pcap2image import transferpacket2matrixbycols
+    for i,filename in enumerate(["skype.pcap","jumblo.pcap","xlite.pcap","zoiper.pcap","uu.pcap","alt.pcap","kc.pcap"]):
+        (packets, max_len) = pcap2packetspayload("../data/unknow/"+filename)
+        r = random.randint(10, 100)
+        num = 0
+        while num < 15:
+            f = 0
+            m = np.zeros((rows, cols), dtype="float32")
+            while f < rows and num*r+f < len(packets):
+                m[f] = transferpacket2matrixbycols(packets[r+f], cols)
+                f += 1
+            num += 1
+            d.append(m)
+            l.append(i)
+    d = d[0:100]
+    l = l[0:100]
+    data = np.asarray(d, dtype="float32")
+    label = np.asarray(l, dtype="float32")
+    data /= np.max(data)
+    data -= np.mean(data)
+    return data,label
+
+def getpretable(rows=100):
+    model = model_from_json(
+        open("../result/model_json_final/alexnet_model_architecture_" + str(rows) + ".json").read())
+    model.load_weights("../result/model_json_final/alexnet_model_weights_" + str(rows) + ".h5")
+    data ,label = get100pcap(rows=rows)
+    pred_label = model.predict(data,batch_size=1, verbose=1)
+    print(type(pred_label[0]))
+    file = open('../result/pred/100pred_label_'+str(rows), 'w')
+    for pred in pred_label:
+        file.write(str(pred[0])+" "+str(pred[1])+" "+str(pred[2])+" "+str(pred[3])+" "+str(pred[4])+" "+str(pred[5])+" "+str(pred[6])+"\r\n")
+    file.close()
+    file_label = open('../result/pred/100label_'+str(rows), 'w')
+    for l in label:
+        file_label.write(str(l)+"\r\n")
+    file_label.close()
 
 if __name__=="__main__":
-    for row in [10,20,40,100]:
-        getpretable(rows=row)
+    # for row in [10,20,40,100]:
+    #     getpretable(rows=row)
     pmodel10 = plotmodel(rows=10)
     pmodel20 = plotmodel(rows=20)
     pmodel40 = plotmodel(rows=40)
     pmodel100 = plotmodel(rows=100)
-    drawpicture(pmodel10,pmodel20,pmodel40,pmodel100)
+    # drawpicture(pmodel10,pmodel20,pmodel40,pmodel100)
+    print(pmodel10.confusedmatrix())
+    print(pmodel10.precision())
+    print(pmodel10.precisionbycm())
+    print(pmodel10.recall())
+    print(pmodel10.recallbycm())

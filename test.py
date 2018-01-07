@@ -155,20 +155,23 @@ import matplotlib.pyplot as plt
 # print(type(acc10))
 # print(type(a))
 
-file = open("../result/pred/test.txt")
-for line in file:
-	label = line.strip().split(" ")
-	print label
-	print(type(label[0]))
-	print(type(label))
-	str_label = np.array(label)
-	print(type(str_label[0]))
-	print(type(str_label))
-	float_label = str_label.astype(np.float)
-	print(type(float_label[0]))
-	print(type(float_label))
-
-	float2_label = np.asarray(label,dtype="float")
-	print(type(float2_label[0]))
-	print(type(float2_label))
-
+# file = open("../result/pred/test.txt")
+# for line in file:
+# 	label = line.strip().split(" ")
+# 	print label
+# 	print(type(label[0]))
+# 	print(type(label))
+# 	str_label = np.array(label)
+# 	print(type(str_label[0]))
+# 	print(type(str_label))
+# 	float_label = str_label.astype(np.float)
+# 	print(type(float_label[0]))
+# 	print(type(float_label))
+#
+# 	float2_label = np.asarray(label,dtype="float")
+# 	print(type(float2_label[0]))
+# 	print(type(float2_label))
+# m = [ [] for i in range(7) ]
+# print m
+import random
+print (random.randint(10, 100))
