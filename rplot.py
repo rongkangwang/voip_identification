@@ -208,7 +208,7 @@ def get100pcap(rows=100,cols=256):
     data -= np.mean(data)
     return data,label
 
-def getpretable(rows=100):
+def get100pretable(rows=100):
     model = model_from_json(
         open("../result/model_json_final/alexnet_model_architecture_" + str(rows) + ".json").read())
     model.load_weights("../result/model_json_final/alexnet_model_weights_" + str(rows) + ".h5")
@@ -225,20 +225,24 @@ def getpretable(rows=100):
     # file_label.close()
 
 if __name__=="__main__":
-    # for row in [10,20,40,100]:
-    #     getpretable(rows=row)
-    pmodel10 = plotmodel(rows=10)
-    pmodel20 = plotmodel(rows=20)
-    pmodel40 = plotmodel(rows=40)
-    pmodel100 = plotmodel(rows=100)
-    # drawpicture(pmodel10,pmodel20,pmodel40,pmodel100)
-    print(pmodel10.confusedmatrix())
-    print(pmodel10.precision())
-    print(pmodel10.precisionbycm())
-    print(pmodel10.recall())
-    print(pmodel10.recallbycm())
-    # getpretable(rows=10)
-    # getpretable(rows=20)
-    # getpretable(rows=40)
-    # getpretable(rows=100)
+    for row in [8]:
+        getpretable(rows=row)
+    pmodel8 = plotmodel(rows=8)
+    print(pmodel8.overallacc)
+    # # for row in [10,20,40,100]:
+    # #     getpretable(rows=row)
+    # pmodel10 = plotmodel(rows=10)
+    # pmodel20 = plotmodel(rows=20)
+    # pmodel40 = plotmodel(rows=40)
+    # pmodel100 = plotmodel(rows=100)
+    # # drawpicture(pmodel10,pmodel20,pmodel40,pmodel100)
+    # print(pmodel10.confusedmatrix())
+    # print(pmodel10.precision())
+    # print(pmodel10.precisionbycm())
+    # print(pmodel10.recall())
+    # print(pmodel10.recallbycm())
+    # # getpretable(rows=10)
+    # # getpretable(rows=20)
+    # # getpretable(rows=40)
+    # # getpretable(rows=100)
 
