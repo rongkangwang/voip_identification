@@ -17,7 +17,7 @@ import numpy as np
 np.random.seed(1024)  # for reproducibility
 #input_shape = (rows,256,1)
 
-nb_class = 7
+nb_class = 10
 
 def create_alexnet_model(input_shape=(100,256,1)):
 	model = Sequential()
@@ -269,7 +269,7 @@ def checkprint(rows=100):
 	model.summary()
 
 if __name__=="__main__":
-	rs = [8]
+	rs = [10]
 	for rows in rs:
 		train(rows=rows)
 	# checkprint(rows=8)

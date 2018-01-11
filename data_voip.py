@@ -17,7 +17,7 @@ def load_data(rows=100):
     d = []
     l = []
     for di in os.listdir(filepath):
-        if(di=="skype" or di=="jumblo" or di=="uu" or di=="xlite" or di=="zoiper" or di=="kc" or di=="alt"):
+        if(di=="skype" or di=="jumblo" or di=="uu" or di=="xlite" or di=="zoiper" or di=="kc" or di=="alt" or di=="eyebeam" or di=="expresstalk" or di=="bria"):
             # print di
             pnum = 0
             voipdir = os.path.join(filepath,di)
@@ -41,8 +41,14 @@ def load_data(rows=100):
                         l.append(5)
                     elif (di == "kc"):
                         l.append(6)
+                    elif (di == "eyebeam"):
+                        l.append(7)
+                    elif (di == "expresstalk"):
+                        l.append(8)
+                    elif (di == "bria"):
+                        l.append(9)
                     pnum = pnum+1
-                    if(pnum>=30000):
+                    if(pnum>=10000):
                         print pnum
                         pnum = 0
                         break
