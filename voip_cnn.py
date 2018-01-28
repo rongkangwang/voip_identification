@@ -16,17 +16,17 @@ from keras.callbacks import EarlyStopping
 import numpy as np
 
 np.random.seed(1024)  # for reproducibility
-rows_default = 100
+rows_default = 20
 cols_default = 256
 image_shape = (rows_default,cols_default,1)
 
 
 #加载数据
-data, label = load_data()
+data, label = load_data(rows=20)
 
 
 #label为0~9共10个类别，keras要求形式为binary class matrices,转化一下，直接调用keras提供的这个函数
-nb_class = 7
+nb_class = 10
 label = np_utils.to_categorical(label, nb_class)
 
 
@@ -63,13 +63,13 @@ index = [i for i in range(len(data))]
 random.shuffle(index)
 data = data[index]
 label = label[index]
-(X_train,X_val) = (data[0:12000],data[12000:])
-(Y_train,Y_val) = (label[0:12000],label[12000:])
+(X_train,X_val) = (data[0:80000],data[80000:])
+(Y_train,Y_val) = (label[0:80000],label[80000:])
 
 #使用early stopping返回最佳epoch对应的model 
 early_stopping = EarlyStopping(monitor='val_loss', patience=1)
 model.fit(X_train, Y_train, batch_size=100,validation_data=(X_val, Y_val),epochs=10,callbacks=[early_stopping])
 json_string = model.to_json()
-open('cnn_model_architecture_100.json','w').write(json_string)
-model.save_weights('cnn_model_weights_100.h5')
+open('../data/model_json/cnn_model_architecture_20.json','w').write(json_string)
+model.save_weights('../data/model_json/cnn_model_weights_20.h5')
 #cPickle.dump(model,open("./model.pkl","wb"))
