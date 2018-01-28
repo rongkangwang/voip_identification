@@ -112,14 +112,14 @@ import struct
 #
 # print(anp)
 
-import data_voip
-import numpy as np
-from PIL import Image
+# import data_voip
+# import numpy as np
+# from PIL import Image
 
-(data,label) = data_voip.load_data(rows=2)
+# (data,label) = data_voip.load_data(rows=2)
 
-print(np.shape(data))
-print(np.shape(label))
+# print(np.shape(data))
+# print(np.shape(label))
 # for i in range(10):
 # 	open("test.txt","a+").write("%d\r\n"%(233))
 import numpy
@@ -175,3 +175,10 @@ import matplotlib.pyplot as plt
 # print m
 # import random
 # print (random.randint(10, 100))
+import seaborn as sns
+x=[1,2,3,4,5,6,7]
+y=[0.7,0.8,0.77,0.9,0.65,0.55,0.79]
+sns.set()                       
+plt.plot(x,y,color="r")
+
+plt.show()

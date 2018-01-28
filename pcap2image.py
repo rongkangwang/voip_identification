@@ -480,7 +480,7 @@ def shufflepackets(packets):
     return pkts
 
 if __name__=="__main__":
-    for rows_default in [10]:
+    for rows_default in [20,40,100]:
         for type in types:
             imagecount = 1
             if (platform.uname()[0] == "Linux"):
@@ -501,7 +501,7 @@ if __name__=="__main__":
                     filename = os.path.join(filepath, file)
                     (packets_init, max_len) = pcap2packetspayload(filename)
                     # getimgbydims(packets_init,rows=rows_default,cols=cols_default)
-                    for i in range(10):
+                    for i in range(100):
                         packets_init = shufflepackets(packets_init)
                         getimgbydims(packets_init,rows=rows_default,cols=cols_default)
                         
@@ -522,7 +522,7 @@ if __name__=="__main__":
                     filename = os.path.join(filepath, file)
                     (packets_init, max_len) = pcap2packetspayload(filename)
                     # getimgbydims(packets_init,rows=rows_default,cols=cols_default)
-                    for i in range(50):
+                    for i in range(1000):
                         packets_init = shufflepackets(packets_init)
                         getimgbydims(packets_init,rows=rows_default,cols=cols_default)
                         
