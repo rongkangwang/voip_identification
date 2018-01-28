@@ -269,7 +269,7 @@ def checkprint(rows=100):
 	model.summary()
 
 if __name__=="__main__":
-	rs = [2,4,6,8,10,20,40,100]
-	for rows in rs:
-		train(rows=rows)
-	# checkprint(rows=8)
+	#rs = [2,4,6,8,10,20,40,100]
+	#for rows in rs:
+	#	train(rows=rows)
+	checkprint(rows=100)
