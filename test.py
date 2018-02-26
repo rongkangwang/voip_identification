@@ -175,10 +175,18 @@ import matplotlib.pyplot as plt
 # print m
 # import random
 # print (random.randint(10, 100))
-import seaborn as sns
-x=[1,2,3,4,5,6,7]
-y=[0.7,0.8,0.77,0.9,0.65,0.55,0.79]
-sns.set()                       
-plt.plot(x,y,color="r")
+# import seaborn as sns
+# x=[1,2,3,4,5,6,7]
+# y=[0.7,0.8,0.77,0.9,0.65,0.55,0.79]
+# sns.set()
+# plt.plot(x,y,color="r")
+#
+# plt.show()
+result1 = struct.pack('B',0xca)
+result2 = struct.pack('B',0x4e)
 
-plt.show()
+port = struct.unpack('H', result2+result1)[0]
+print port
+
+from capturer import isbigendian
+isbigendian()
