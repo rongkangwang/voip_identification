@@ -51,8 +51,8 @@ class plotmodel:
     def confusedmatrix(self):
         m = [ [ 0 for j in range(10) ] for i in range(10) ]
         for i in range(self.labelnum):
-            c = np.argmax(self.pred_label[i])
-            r = self.label[i]
+            c = np.argmax(self.pred_label[i])  #col : pred label
+            r = self.label[i]                  #row : real label
             m[r][c] += 1
         return m
 
@@ -137,17 +137,18 @@ class plotmodel:
         l = len(self.cm)
         tpr = [0.0 for i in range(l)]
         for i in range(l):
-            colsum = sum(self.cm[r][i] for r in range(l))
-            tpr[i] = float(self.cm[i][i])/colsum
+            rowsum = sum(self.cm[i])   # rowsum : tp+fn 
+            tpr[i] = float(self.cm[i][i])/rowsum
         return tpr
 
     def fprbycm(self):
         l = len(self.cm)
         fpr = [0.0 for i in range(l)]
         for i in range(l):
-            colsum = sum(self.cm[r][i] for r in range(l))
-	    f_sum = sum(self.cm[r][i] for r in range(l) if r != i)
-            fpr[i] = f_sum/colsum
+            # colsum = sum(self.cm[r][i] for r in range(l))
+	    fp_num = sum(self.cm[r][i] for r in range(l) if r != i)
+	    tn_num = sum(self.cm[r][r] for r in range(l) if r != i)
+            fpr[i] = float(fp_num)/(fp_num+tn_num)
         return fpr
 
 
@@ -255,7 +256,7 @@ def saveresults(models):
     file.close()
 
 if __name__=="__main__":
-    for row in [40,100]:
+    for row in [4,6,8,10,20]:
         getpretable(rows=row)
     # pmodel8 = plotmodel(rows=8)
     # print(pmodel8.overallacc)
@@ -276,7 +277,7 @@ if __name__=="__main__":
     # # getpretable(rows=40)
     # # getpretable(rows=100)
     #models = []
-    #for r in [40,100]:
+    #for r in [2]:
     #    models.append(plotmodel(rows=r))
     #saveresults(models)
 

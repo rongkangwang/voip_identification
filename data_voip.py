@@ -48,7 +48,7 @@ def load_data(rows=100):
                     elif (di == "bria"):
                         l.append(9)
                     pnum = pnum+1
-                    if(pnum>=20000):
+                    if(pnum>=10000):
                         print pnum
                         pnum = 0
                         break
