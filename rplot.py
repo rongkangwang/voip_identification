@@ -41,8 +41,10 @@ class plotmodel:
         self.cm = self.confusedmatrix()
         self.overallacc = self.overallacc()
         
-        # self.precision = self.precision()
-        # self.recall = self.recall()
+        self.precision = self.precision()
+        self.recall = self.recall()
+        self.fpr = self.fpr()
+        self.tpr = self.tprbycm()
         # self.fscore = self.fscore()
 
     def confusedmatrix(self):
@@ -129,6 +131,15 @@ class plotmodel:
                 fp[predict] += 1.0
         voip_fpr = [fp[i]/(fp[i]+tn[i]) for i in range(10)]
         return voip_fpr
+
+    def tprbycm(self):
+        l = len(self.cm)
+        tpr = [0.0 for i in range(l)]
+        for i in range(l):
+            colsum = sum(self.cm[r][i] for r in range(l))
+            tpr[i] = float(self.cm[i][i])/colsum
+        return tpr
+
 
     def far(self):   # Class FAR or class FP rate
         f = [0.0 for i in range(10)]
@@ -227,9 +238,15 @@ def get100pretable(rows=100):
     #     file_label.write(str(l)+"\r\n")
     # file_label.close()
 
+def saveresults(models):
+    file = open('../result/evaluation/data', 'w')
+    for model in models:
+        file.write("rows->"+str(model.rows)+", overallacc->"+str(model.overallacc)+", precision->"+str(model.precision)+", recall->"+str(model.recall)+", fpr->"+str(model.fpr)+", tpr->"+str(model.tpr))
+    file.close()
+
 if __name__=="__main__":
-    # for row in [2,4,6,8,10,20]:
-    #     getpretable(rows=row)
+    for row in [40,100]:
+        getpretable(rows=row)
     # pmodel8 = plotmodel(rows=8)
     # print(pmodel8.overallacc)
     # # for row in [10,20,40,100]:
@@ -248,8 +265,8 @@ if __name__=="__main__":
     # # getpretable(rows=20)
     # # getpretable(rows=40)
     # # getpretable(rows=100)
-    models = []
-    for r in [2,4,6,8,10,20]:
-        models.append(plotmodel(rows=r))
-    drawpicture(models)
+    #models = []
+    #for r in [40,100]:
+    #    models.append(plotmodel(rows=r))
+    #saveresults(models)
 
