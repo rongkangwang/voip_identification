@@ -13,7 +13,7 @@ def getpretable(rows=100):
     print(type(pred_label[0]))
     file = open('../result/pred_10/pred_label_'+str(rows), 'w')
     for pred in pred_label:
-        file.write(str(pred[0])+" "+str(pred[1])+" "+str(pred[2])+" "+str(pred[3])+" "+str(pred[4])+" "+str(pred[5])+" "+str(pred[6])+"\r\n")
+        file.write(str(pred[0])+" "+str(pred[1])+" "+str(pred[2])+" "+str(pred[3])+" "+str(pred[4])+" "+str(pred[5])+" "+str(pred[6])+" "+str(pred[7])+" "+str(pred[8])+" "+str(pred[9])+"\r\n")
     file.close()
     file_label = open('../result/pred_10/label_'+str(rows), 'w')
     for l in label:
@@ -41,15 +41,18 @@ class plotmodel:
         self.cm = self.confusedmatrix()
         self.overallacc = self.overallacc()
         
-        # self.precision = self.precision()
-        # self.recall = self.recall()
+        self.precision = self.precision()
+        self.recall = self.recall()
+        self.fpr = self.fpr()
+	self.fprcm = self.fprbycm()
+        self.tpr = self.tprbycm()
         # self.fscore = self.fscore()
 
     def confusedmatrix(self):
         m = [ [ 0 for j in range(10) ] for i in range(10) ]
         for i in range(self.labelnum):
-            c = np.argmax(self.pred_label[i])
-            r = self.label[i]
+            c = np.argmax(self.pred_label[i])  #col : pred label
+            r = self.label[i]                  #row : real label
             m[r][c] += 1
         return m
 
@@ -129,6 +132,25 @@ class plotmodel:
                 fp[predict] += 1.0
         voip_fpr = [fp[i]/(fp[i]+tn[i]) for i in range(10)]
         return voip_fpr
+
+    def tprbycm(self):
+        l = len(self.cm)
+        tpr = [0.0 for i in range(l)]
+        for i in range(l):
+            rowsum = sum(self.cm[i])   # rowsum : tp+fn 
+            tpr[i] = float(self.cm[i][i])/rowsum
+        return tpr
+
+    def fprbycm(self):
+        l = len(self.cm)
+        fpr = [0.0 for i in range(l)]
+        for i in range(l):
+            # colsum = sum(self.cm[r][i] for r in range(l))
+	    fp_num = sum(self.cm[r][i] for r in range(l) if r != i)
+	    tn_num = sum(self.cm[r][r] for r in range(l) if r != i)
+            fpr[i] = float(fp_num)/(fp_num+tn_num)
+        return fpr
+
 
     def far(self):   # Class FAR or class FP rate
         f = [0.0 for i in range(10)]
@@ -220,16 +242,22 @@ def get100pretable(rows=100):
     print(type(pred_label[0]))
     file = open('../result/pred100/100pred_label_'+str(rows), 'w')
     for pred in pred_label:
-        file.write(str(pred[0])+" "+str(pred[1])+" "+str(pred[2])+" "+str(pred[3])+" "+str(pred[4])+" "+str(pred[5])+" "+str(pred[6])+"\r\n")
+        file.write(str(pred[0])+" "+str(pred[1])+" "+str(pred[2])+" "+str(pred[3])+" "+str(pred[4])+" "+str(pred[5])+" "+str(pred[6])+" "+str(pred[7])+" "+str(pred[8])+" "+str(pred[9])+"\r\n")
     file.close()
     # file_label = open('../result/pred/100label_'+str(rows), 'w')
     # for l in label:
     #     file_label.write(str(l)+"\r\n")
     # file_label.close()
 
+def saveresults(models):
+    file = open('../result/evaluation/data', 'w')
+    for model in models:
+        file.write("rows->"+str(model.rows)+", overallacc->"+str(model.overallacc)+", precision->"+str(model.precision)+", recall->"+str(model.recall)+", fpr->"+str(model.fpr)+", fprcm->"+str(model.fprcm)+", tpr->"+str(model.tpr))
+    file.close()
+
 if __name__=="__main__":
-    # for row in [2,4,6,8,10,20]:
-    #     getpretable(rows=row)
+    for row in [4,6,8,10,20]:
+        getpretable(rows=row)
     # pmodel8 = plotmodel(rows=8)
     # print(pmodel8.overallacc)
     # # for row in [10,20,40,100]:
@@ -248,8 +276,8 @@ if __name__=="__main__":
     # # getpretable(rows=20)
     # # getpretable(rows=40)
     # # getpretable(rows=100)
-    models = []
-    for r in [2,4,6,8,10,20]:
-        models.append(plotmodel(rows=r))
-    drawpicture(models)
+    #models = []
+    #for r in [2]:
+    #    models.append(plotmodel(rows=r))
+    #saveresults(models)
 
