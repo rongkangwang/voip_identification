@@ -13,7 +13,7 @@ def getpretable(rows=100):
     print(type(pred_label[0]))
     file = open('../result/pred_10/pred_label_'+str(rows), 'w')
     for pred in pred_label:
-        file.write(str(pred[0])+" "+str(pred[1])+" "+str(pred[2])+" "+str(pred[3])+" "+str(pred[4])+" "+str(pred[5])+" "+str(pred[6])+"\r\n")
+        file.write(str(pred[0])+" "+str(pred[1])+" "+str(pred[2])+" "+str(pred[3])+" "+str(pred[4])+" "+str(pred[5])+" "+str(pred[6])+" "+str(pred[7])+" "+str(pred[8])+" "+str(pred[9])+"\r\n")
     file.close()
     file_label = open('../result/pred_10/label_'+str(rows), 'w')
     for l in label:
@@ -44,6 +44,7 @@ class plotmodel:
         self.precision = self.precision()
         self.recall = self.recall()
         self.fpr = self.fpr()
+	self.fprcm = self.fprbycm()
         self.tpr = self.tprbycm()
         # self.fscore = self.fscore()
 
@@ -140,6 +141,15 @@ class plotmodel:
             tpr[i] = float(self.cm[i][i])/colsum
         return tpr
 
+    def fprbycm(self):
+        l = len(self.cm)
+        fpr = [0.0 for i in range(l)]
+        for i in range(l):
+            colsum = sum(self.cm[r][i] for r in range(l))
+	    f_sum = sum(self.cm[r][i] for r in range(l) if r != i)
+            fpr[i] = f_sum/colsum
+        return fpr
+
 
     def far(self):   # Class FAR or class FP rate
         f = [0.0 for i in range(10)]
@@ -231,7 +241,7 @@ def get100pretable(rows=100):
     print(type(pred_label[0]))
     file = open('../result/pred100/100pred_label_'+str(rows), 'w')
     for pred in pred_label:
-        file.write(str(pred[0])+" "+str(pred[1])+" "+str(pred[2])+" "+str(pred[3])+" "+str(pred[4])+" "+str(pred[5])+" "+str(pred[6])+"\r\n")
+        file.write(str(pred[0])+" "+str(pred[1])+" "+str(pred[2])+" "+str(pred[3])+" "+str(pred[4])+" "+str(pred[5])+" "+str(pred[6])+" "+str(pred[7])+" "+str(pred[8])+" "+str(pred[9])+"\r\n")
     file.close()
     # file_label = open('../result/pred/100label_'+str(rows), 'w')
     # for l in label:
@@ -241,7 +251,7 @@ def get100pretable(rows=100):
 def saveresults(models):
     file = open('../result/evaluation/data', 'w')
     for model in models:
-        file.write("rows->"+str(model.rows)+", overallacc->"+str(model.overallacc)+", precision->"+str(model.precision)+", recall->"+str(model.recall)+", fpr->"+str(model.fpr)+", tpr->"+str(model.tpr))
+        file.write("rows->"+str(model.rows)+", overallacc->"+str(model.overallacc)+", precision->"+str(model.precision)+", recall->"+str(model.recall)+", fpr->"+str(model.fpr)+", fprcm->"+str(model.fprcm)+", tpr->"+str(model.tpr))
     file.close()
 
 if __name__=="__main__":
