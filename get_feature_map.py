@@ -20,8 +20,8 @@ import numpy as np
 
 #load the saved model
 #model = cPickle.load(open("model.pkl","rb"))
-model = model_from_json(open("cnn_model_architecture_224.json").read())
-model.load_weights("cnn_model_weights_224.h5")
+model = model_from_json(open("").read())
+model.load_weights("")
 
 #define theano funtion to get output of  FC layer
 #get_feature = theano.function([model.layers[0].input],model.layers[11].output,allow_input_downcast=False) 
@@ -29,7 +29,7 @@ model.load_weights("cnn_model_weights_224.h5")
 #define theano funtion to get output of  first Conv layer 
 #get_featuremap = theano.function([model.layers[0].input],model.layers[2].output,allow_input_downcast=False) 
 from keras import backend as K
-get_feature = K.function([model.layers[0].input],[model.layers[-1].output])
+get_feature = K.function([model.layers[0].input],[model.layers[1].output])
 get_featuremap = K.function([model.layers[0].input],[model.layers[1].output])
 
 data, label = load_data()
