@@ -9,7 +9,11 @@ def getpretable(rows=100):
         open("../result/model_json_final_10/alexnet_model_architecture_" + str(rows) + ".json").read())
     model.load_weights("../result/model_json_final_10/alexnet_model_weights_" + str(rows) + ".h5")
     data ,label = load_data(rows=rows)
+    import time
+    start_time = time.time()
     pred_label = model.predict(data,batch_size=1, verbose=1)
+    end_time = time.time()
+    print str(rows)+"->"+str(end_time-start_time)
     print(type(pred_label[0]))
     file = open('../result/pred_10/pred_label_'+str(rows), 'w')
     for pred in pred_label:
@@ -24,14 +28,14 @@ class plotmodel:
     def __init__(self,rows=100):
         self.rows = rows
         pred = []
-        file = open('../result/pred_10/pred_label_'+str(self.rows), 'r')
+        file = open('../result/pred_final/10000/pred_label_'+str(self.rows), 'r')
         for line in file:
             label = line.strip().split(" ")
             #folat_label = np.asarray(label,dtype="float")
             pred.append(label)
         self.pred_label = np.asarray(pred,dtype="float")
         tru = []
-        file = open('../result/pred_10/label_'+str(self.rows), 'r')
+        file = open('../result/pred_final/10000/label_'+str(self.rows), 'r')
         for line in file:
             label = line.strip()
             tru.append(label)
@@ -46,7 +50,9 @@ class plotmodel:
         #self.fpr = self.fpr()
 	self.fpr = self.fprbycm()
         self.tpr = self.tprbycm()
-        # self.fscore = self.fscore()
+	self.fnr = self.fnr()
+        self.tnr = self.tnr()
+        self.fscore = self.fscore()
 
     def confusedmatrix(self):
         m = [ [ 0 for j in range(10) ] for i in range(10) ]
@@ -151,6 +157,19 @@ class plotmodel:
             fpr[i] = float(fp_num)/(fp_num+tn_num)
         return fpr
 
+    def fnr(self):
+        l = len(self.cm)
+        fnr = [0.0 for i in range(l)]
+        for i in range(l):
+	    fnr[i] = 1.0-self.tpr[i]
+	return fnr
+    def tnr(self):
+        l = len(self.cm)
+        tnr = [0.0 for i in range(l)]
+        for i in range(l):
+	    tnr[i] = 1.0-self.fpr[i]
+	return tnr
+
 
     def far(self):   # Class FAR or class FP rate
         f = [0.0 for i in range(10)]
@@ -163,7 +182,11 @@ class plotmodel:
         return far
 
     def fscore(self):
-        return 2*self.precision*self.recall/(self.precision+self.recall)
+        l = len(self.cm)
+        fscore = [0.0 for i in range(l)]
+        for i in range(l):
+	    fscore[i] = 2*self.precision[i]*self.recall[i]/(self.precision[i]+self.recall[i])
+        return fscore
 
     def unknowpkt(self):
         return
@@ -252,12 +275,230 @@ def get100pretable(rows=100):
 def saveresults(models):
     file = open('../result/evaluation/data', 'w')
     for model in models:
-        file.write("rows->"+str(model.rows)+", overallacc->"+str(model.overallacc)+",\r\n precision->"+str(model.precision)+", \r\nrecall->"+str(model.recall)+", \r\nfpr->"+str(model.fpr)+", \r\ntpr->"+str(model.tpr)+"\r\n\r\n")
+        file.write("rows->"+str(model.rows)+", overallacc->"+str(model.overallacc)+",\r\n precision->"+str(model.precision)+", \r\nrecall->"+str(model.recall)+", \r\nfpr->"+str(model.fpr)+", tpr->"+str(model.tpr)+"\r\n\r\n")
     file.close()
 
+def save2xlsx(models):
+    import xlwt
+    workbook = xlwt.Workbook(encoding='utf-8')
+    tables = []
+    table = workbook.add_sheet('Skype') #0
+    tables.append(table)
+    table = workbook.add_sheet('Jumblo') #1
+    tables.append(table)
+    table = workbook.add_sheet('Xlite') #2
+    tables.append(table)
+    table = workbook.add_sheet('Zoiper') #3
+    tables.append(table)
+    table = workbook.add_sheet('UU') #4
+    tables.append(table)
+    table = workbook.add_sheet('ALT') #5
+    tables.append(table)
+    table = workbook.add_sheet('KC') #6
+    tables.append(table)
+    table = workbook.add_sheet('Eyebeam') #7
+    tables.append(table)
+    table = workbook.add_sheet('ExpressTalk') #8
+    tables.append(table)
+    table = workbook.add_sheet('Bria') #9
+    tables.append(table)
+    
+    for sheet in tables:
+	sheet.write(0,0,"Row")
+	sheet.write(0,1,"Precision")
+	sheet.write(0,2,"Recall")
+	sheet.write(0,3,"FPR")
+	sheet.write(0,4,"TPR")
+	sheet.write(0,5,"FNR")
+	sheet.write(0,6,"TNR")
+	sheet.write(0,7,"F-Score")
+	sheet.write(1,0,2)
+	sheet.write(2,0,4)
+	sheet.write(3,0,6)
+	sheet.write(4,0,8)
+	sheet.write(5,0,10)
+	sheet.write(6,0,20)
+	sheet.write(7,0,40)
+	sheet.write(8,0,100)
+    for i,sheet in enumerate(tables):
+        for j,model in enumerate(models):
+	    sheet.write(j+1,1,model.precision[i])
+	    sheet.write(j+1,2,model.recall[i])
+	    sheet.write(j+1,3,model.fpr[i])
+	    sheet.write(j+1,4,model.tpr[i])
+	    sheet.write(j+1,5,model.fnr[i])
+	    sheet.write(j+1,6,model.tnr[i])
+	    sheet.write(j+1,7,model.fscore[i])
+    workbook.save("results.xlsx")
+
+def savepredict2xlsx(row):
+    print row
+    import xlwt
+    workbook = xlwt.Workbook(encoding='utf-8')
+    tables = []
+    table = workbook.add_sheet('Skype') #0
+    tables.append(table)
+    table = workbook.add_sheet('Jumblo') #1
+    tables.append(table)
+    table = workbook.add_sheet('Xlite') #2
+    tables.append(table)
+    table = workbook.add_sheet('Zoiper') #3
+    tables.append(table)
+    table = workbook.add_sheet('UU') #4
+    tables.append(table)
+    table = workbook.add_sheet('ALT') #5
+    tables.append(table)
+    table = workbook.add_sheet('KC') #6
+    tables.append(table)
+    table = workbook.add_sheet('Eyebeam') #7
+    tables.append(table)
+    table = workbook.add_sheet('ExpressTalk') #8
+    tables.append(table)
+    table = workbook.add_sheet('Bria') #9
+    tables.append(table)
+    for sheet in tables:
+	sheet.write(0,0,"P_index")
+	sheet.write(0,1,"R_index")
+	sheet.write(0,2,"P_pro")
+	sheet.write(0,3,"R_pro")
+    #for row in [2,4,6,8,10,20,40,100]:
+
+    pred = []
+    file = open('../result/pred_final/pred_1000/pred_label_'+str(row), 'r')
+    for line in file:
+        label = line.strip().split(" ")
+            #folat_label = np.asarray(label,dtype="float")
+        pred.append(label)
+    pred_label = np.asarray(pred,dtype="float")
+    tru = []
+    file = open('../result/pred_final/pred_1000/label_'+str(row), 'r')
+    for line in file:
+        label = line.strip()
+        tru.append(label)
+    tru_label = np.asarray(tru,dtype="float")
+    #num = len(tru_label)
+    for i,sheet in enumerate(tables):
+	r = 1
+	for j in range(i*1000,(i+1)*1000):
+	    #r = j-i*1000+1
+	    pred = np.argmax(pred_label[j])
+	    tru = int(tru_label[j])
+	    if pred!=tru:
+	        sheet.write(r,0,pred)
+	        sheet.write(r,1,tru)
+	        sheet.write(r,2,pred_label[j][pred])
+	        sheet.write(r,3,pred_label[j][tru])
+		r = r+1
+    workbook.save("pred_"+str(row)+".xlsx")
+	    
+
+    
+
+def snsdrawsub():
+    import pandas as pd
+    import seaborn as sns
+    import xlrd
+    #book = xlrd.open_workbook("results_unknown.xlsx")
+    #sheet = book.sheet_by_name("Skype")
+    #print sheet.name
+    #for sheet in book.sheets():
+	#print sheet.name
+        #data = pd.read_excel("results_unknown.xlsx",sheet_name=sheet.name)
+        #print data
+    sns.set_style("dark")
+    sns.despine(right=True)
+    fig, axes = plt.subplots(3,4)
+    book = xlrd.open_workbook("results_unknown.xlsx")
+    for i,sheet in enumerate(book.sheets()):
+        data = pd.read_excel("results_unknown.xlsx",sheet_name=i)
+        x1 = pd.Series(np.array([2,4,6,8,10,20,40,100]))
+        y1 = data.iloc[:,[4,6]]
+        
+        y1.plot(title=sheet.name,x=x1,style=["-gd","-bd"],ax=axes[i/4][i-4*(i/4)])
+    plt.show()
+
+def snsdraw():
+    import pandas as pd
+    import seaborn as sns
+    import xlrd
+    #book = xlrd.open_workbook("results_unknown.xlsx")
+    #sheet = book.sheet_by_name("Skype")
+    #print sheet.name
+    #for sheet in book.sheets():
+	#print sheet.name
+        #data = pd.read_excel("results_unknown.xlsx",sheet_name=sheet.name)
+        #print data
+    sns.set_style("whitegrid")
+    sns.despine()
+    sns.set_palette("husl",2)
+    #sns.despine(right=True)
+    #fig, axes = plt.subplots(3,4)
+    book = xlrd.open_workbook("results_unknown.xlsx")
+    for i,sheet in enumerate(book.sheets()):
+	data = pd.read_excel("results_unknown.xlsx",sheet_name=i)
+	x1 = pd.Series(np.array([2,4,6,8,10,20,40,100]))
+	y1 = data.iloc[:,[4,6]]
+	y1.plot(title=sheet.name,x=x1,style=["-o","-o"]).legend(bbox_to_anchor=(1.0,0.16))
+	plt.savefig("../result/plot_final/"+sheet.name+".eps",format="eps")
+
+def falsepredict():
+    import xlwt
+    workbook = xlwt.Workbook(encoding='utf-8')
+    for row in [2,4,6,8,10,20,40,100]:
+        sheet = workbook.add_sheet(str(row)) #0
+        sheet.write(0,0,"T_pro")
+        sheet.write(0,1,"F_pro")
+        #for row in [2,4,6,8,10,20,40,100]:
+    
+        pred = []
+        file = open('../result/pred_final/10000/pred_label_'+str(row), 'r')
+        for line in file:
+            label = line.strip().split(" ")
+                #folat_label = np.asarray(label,dtype="float")
+            pred.append(label)
+        pred_label = np.asarray(pred,dtype="float")
+        tru = []
+        file = open('../result/pred_final/10000/label_'+str(row), 'r')
+        for line in file:
+            label = line.strip()
+            tru.append(label)
+        tru_label = np.asarray(tru,dtype="float")
+        #count = 0
+        tr = 1
+        fr = 1
+        num = len(tru_label)
+        for i in range(0,50000):
+    	    pred = np.argmax(pred_label[i])
+    	    tru = int(tru_label[i])
+    	    if(tru==pred):
+    	        sheet.write(tr,0,pred_label[i][pred])
+		#if pred_label[i][pred]<0.999:
+		    #count = count+1
+		    #print "tpro->"+str(pred_label[i][pred])
+    	        tr = tr+1
+    	    else:
+    	        sheet.write(fr,1,pred_label[i][pred])
+		#if pred_label[i][pred]>0.999:
+		    #print "fpro->"+str(pred_label[i][pred])
+    	        fr = fr+1
+	tr = 1
+        fr = 1
+        for i in range(50000,100000):
+    	    pred = np.argmax(pred_label[i])
+    	    tru = int(tru_label[i])
+    	    if(tru==pred):
+    	        sheet.write(tr,2,pred_label[i][pred])
+    	        tr = tr+1
+    	    else:
+    	        sheet.write(fr,3,pred_label[i][pred])
+    	        fr = fr+1
+    workbook.save("pred.xlsx")
+    
+	
+
 if __name__=="__main__":
-    #for row in [2,4,6,8,10,20]:
-    #    getpretable(rows=row)
+    for row in [2,4,6,8,10,20]:
+        getpretable(rows=row)
     # pmodel8 = plotmodel(rows=8)
     # print(pmodel8.overallacc)
     # # for row in [10,20,40,100]:
@@ -276,8 +517,13 @@ if __name__=="__main__":
     # # getpretable(rows=20)
     # # getpretable(rows=40)
     # # getpretable(rows=100)
-    models = []
-    for r in [2,4,6,8,10,20]:
-        models.append(plotmodel(rows=r))
-    saveresults(models)
+    #models = []
+    #for r in [2,4,6,8,10,20,40,100]:
+    #    models.append(plotmodel(rows=r))
+    #saveresults(models)
+    #save2xlsx(models)
+    #snsdraw()
+    #for r in [2,4,6,8,10,20,40,100]:
+    #    savepredict2xlsx(row=r)
+    #falsepredict()
 
