@@ -1,8 +1,17 @@
+#coding:utf-8
 from keras.layers import Input, Conv2D, MaxPooling2D
 from keras.layers import Flatten, Dense, Dropout
 from keras.layers import LSTM, Reshape, concatenate
 from keras.models import Model
 from keras.utils.vis_utils import plot_model
+from data_voip import load_data
+from keras.callbacks import EarlyStopping
+from keras.optimizers import SGD
+import math
+from keras.callbacks import LearningRateScheduler
+from keras.utils import np_utils, generic_utils
+import numpy as np
+import random,cPickle
 
 nb_class = 11
 
@@ -100,7 +109,8 @@ def train(rows=100):
 	data, label = load_data(rows)
 	label = np_utils.to_categorical(label, nb_class)
 
-	model = create_clnn_model(input_shape=(rows,256,1))
+	model, img_input=create_clnn_model(input_shape=(rows,256,1))
+	model=Model(input=img_input,output=[model])
 
 	import math
 	from keras.callbacks import LearningRateScheduler
@@ -124,7 +134,7 @@ def train(rows=100):
 	(Y_train,Y_val) = (label[0:80000],label[80000:])
 
 	#使用early stopping返回最佳epoch对应的model
-	early_stopping = EarlyStopping(monitor='val_loss', patience=1)
+	early_stopping = EarlyStopping(monitor='loss', patience=1)
 	#全部载入内存
 	model.fit(X_train, Y_train, batch_size=100,validation_data=(X_val, Y_val),epochs=20,callbacks=[early_stopping,lrate])
 	
@@ -137,4 +147,8 @@ def train(rows=100):
 	open('../data/model_json/result.txt', 'a+').write("pkt_num:%d, loss:%f, accuracy:%f\r\n"%(rows,loss,accuracy))
 
 if __name__=="__main__":
-	check_print(rows=100)
+	rs = [2,4,6,8,10,20,40,100]
+	for rows in rs:
+		train(rows=rows)
+	#train(rows=6)
+	#check_print(rows=100)
