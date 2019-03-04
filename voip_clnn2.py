@@ -20,6 +20,8 @@ def create_clnn_model(input_shape=(100,256,1)):
 	conv = create_cnn_layers(img_input)
 	lstm = create_lstm_layers(img_input, input_shape[0])
 	model = concatenate([conv, lstm],axis=1)
+	model = Dense(2048, activation='relu')(model)
+	model = Dropout(0.5)(model)
 	model = Dense(nb_class, activation='softmax')(model)
 	return model, img_input
 
@@ -79,14 +81,16 @@ def create_cnn_layers(img_input):
 	conv = Dense(2048, activation='relu')(conv)
 	conv = Dropout(0.5)(conv)
 
-	conv = Dense(100, activation='relu')(conv)
-	conv = Dropout(0.5)(conv)
 	return conv
 
 def create_lstm_layers(img_input, rows=100):
 	lstm = Reshape((rows,256))(img_input)
 	lstm = LSTM(
-        output_dim=rows,
+        units=512,
+        activation='tanh',
+        return_sequences=True)(lstm)
+	lstm = LSTM(
+        units=512,
         activation='tanh',
         return_sequences=False)(lstm)
 	lstm = Dropout(0.5)(lstm)
@@ -97,7 +101,8 @@ def check_print(rows=100):
 
     # Create a Keras Model
     model=Model(input=img_input,output=[model])
-    model.summary(print_fn=printfunc)
+    model.summary()
+    #model.summary(print_fn=printfunc)
     #print(model.get_config())
     #plot_model(model, to_file='clnn.svg',show_shapes=False)
     print(model)
@@ -150,5 +155,5 @@ if __name__=="__main__":
 	#rs = [6,8,10,20,40,100]
 	#for rows in rs:
 	#	train(rows=rows)
-	#train(rows=6)
-	check_print(rows=100)
+	train(rows=10)
+	#check_print(rows=100)
