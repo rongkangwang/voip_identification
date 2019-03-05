@@ -536,9 +536,58 @@ def savepsd2xlsx():
             sheet.write(tr,0,len(packets_init[i]))
             tr = tr+1
     workbook.save("psd.xlsx")
+def savepsd2xlsx_2():
+    import xlwt
+    if (platform.uname()[0] == "Linux"):
+        filepath = "/home/kang/Documents/data/"
+    elif (platform.uname()[0] == "Darwin"):
+        filepath = "/Users/kang/Documents/workspace/data/" 
+
+    workbook = xlwt.Workbook(encoding='utf-8')
+    tables = []
+    table = workbook.add_sheet('Skype12') #0
+    tables.append(table)
+    table = workbook.add_sheet('Skype13') #1
+    tables.append(table)
+    table = workbook.add_sheet('Xlite') #2
+    tables.append(table)
+    table = workbook.add_sheet('Zoiper') #3
+    tables.append(table)
+    table = workbook.add_sheet('UU') #4
+    tables.append(table)
+    table = workbook.add_sheet('ALT') #5
+    tables.append(table)
+    table = workbook.add_sheet('KC') #6
+    tables.append(table)
+    table = workbook.add_sheet('Eyebeam') #7
+    tables.append(table)
+    table = workbook.add_sheet('ExpressTalk') #8
+    tables.append(table)
+    table = workbook.add_sheet('Bria') #9
+    tables.append(table)
+    for sheet in tables:
+        sheet.write(0,0,"length")
+        if(sheet.name=="Skype12"):
+            filename = filepath + "/skype/skype12.pcap"
+        elif(sheet.name=="Skype13"):
+            filename = filepath + "/skype/skype13.pcap"
+        elif(sheet.name=="ALT"):
+            filename = filepath + "/alt/alt.pcap"
+        else:
+            continue
+
+        (packets_init, max_len) = pcap2packetspayload(filename)
+        tr = 1
+        for i in range(len(packets_init)):
+            if tr>60000:
+                break
+            if (len(packets_init[i])<=256):
+                sheet.write(tr,0,len(packets_init[i]))
+                tr = tr+1
+    workbook.save("psd2.xlsx")
 
 if __name__=="__main__":
     #for packet in packets_init:
     #    print(len(packet))
-    savepsd2xlsx()
+    savepsd2xlsx_2()
                         
