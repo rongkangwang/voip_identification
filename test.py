@@ -182,6 +182,7 @@ import matplotlib.pyplot as plt
 # plt.plot(x,y,color="r")
 #
 # plt.show()
+<<<<<<< HEAD
 #result1 = struct.pack('B',0xca)
 #result2 = struct.pack('B',0x4e)
 
@@ -193,3 +194,13 @@ import matplotlib.pyplot as plt
 a = [2,3]
 a = np.array(a)
 print(a.shape)
+=======
+result1 = struct.pack('B',0xca)
+result2 = struct.pack('B',0x4e)
+
+port = struct.unpack('H', result2+result1)[0]
+print port
+
+from capturer import isbigendian
+isbigendian()
+>>>>>>> 162bf8fb56f49c5dda2580a420014a1b1b2be0a3

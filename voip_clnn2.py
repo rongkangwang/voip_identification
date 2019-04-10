@@ -13,7 +13,11 @@ from keras.utils import np_utils, generic_utils
 import numpy as np
 import random,cPickle
 
+<<<<<<< HEAD
 nb_class = 10
+=======
+nb_class = 11
+>>>>>>> 162bf8fb56f49c5dda2580a420014a1b1b2be0a3
 
 def create_clnn_model(input_shape=(100,256,1)):
 	img_input=Input(input_shape)
@@ -120,7 +124,11 @@ def train(rows=100):
 	import math
 	from keras.callbacks import LearningRateScheduler
 	def step_decay(epoch):
+<<<<<<< HEAD
 	    initial_lrate = 0.002
+=======
+	    initial_lrate = 0.01
+>>>>>>> 162bf8fb56f49c5dda2580a420014a1b1b2be0a3
 	    drop = 0.5
 	    epochs_drop = 5.0
 	    lrate = initial_lrate * math.pow(drop,math.floor((1+epoch)/epochs_drop))
@@ -141,7 +149,11 @@ def train(rows=100):
 	#使用early stopping返回最佳epoch对应的model
 	early_stopping = EarlyStopping(monitor='loss', patience=1)
 	#全部载入内存
+<<<<<<< HEAD
 	model.fit(X_train, Y_train, batch_size=50,validation_data=(X_val, Y_val),epochs=20,callbacks=[early_stopping,lrate])
+=======
+	model.fit(X_train, Y_train, batch_size=100,validation_data=(X_val, Y_val),epochs=20,callbacks=[early_stopping,lrate])
+>>>>>>> 162bf8fb56f49c5dda2580a420014a1b1b2be0a3
 	
 	json_string = model.to_json()
 	open('../data/model_json/alexnet_model_architecture_'+str(rows)+'.json','w').write(json_string)
@@ -152,8 +164,16 @@ def train(rows=100):
 	open('../data/model_json/result.txt', 'a+').write("pkt_num:%d, loss:%f, accuracy:%f\r\n"%(rows,loss,accuracy))
 
 if __name__=="__main__":
+<<<<<<< HEAD
 	rs = [2,4,6,8,10,20,40,100]
 	for rows in rs:
 		train(rows=rows)
 	#train(rows=10)
 	#check_print(rows=100)
+=======
+	#rs = [6,8,10,20,40,100]
+	#for rows in rs:
+	#	train(rows=rows)
+	#train(rows=10)
+	check_print(rows=100)
+>>>>>>> 162bf8fb56f49c5dda2580a420014a1b1b2be0a3

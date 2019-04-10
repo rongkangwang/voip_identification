@@ -25,8 +25,13 @@ def getvoipfeature(rows=100):
 	#define theano funtion to get output of  first Conv layer 
 	#get_featuremap = theano.function([model.layers[0].input],model.layers[2].output,allow_input_downcast=False) 
 
+<<<<<<< HEAD
 	get_feature = K.function([model.layers[0].input],[model.layers[-2].output])
 	get_featuremap = K.function([model.layers[0].input],[model.layers[-2].output])
+=======
+	get_feature = K.function([model.layers[0].input],[model.layers[-1].output])
+	get_featuremap = K.function([model.layers[0].input],[model.layers[10].output])
+>>>>>>> 162bf8fb56f49c5dda2580a420014a1b1b2be0a3
 
 	data, label = load_data(rows=rows)
 	# visualize feature  of  Fully Connected layer
@@ -34,11 +39,16 @@ def getvoipfeature(rows=100):
 	print(len(get_feature([data[0:10]])[0]))
 	feature = get_feature([data[0:10]])[0]  #visualize these images's FC-layer feature
 	#feature = np.squeeze(np.array(feature))
+<<<<<<< HEAD
 	feature = np.concatenate((feature,feature,feature,feature,feature,feature,feature,feature,feature,feature), axis=0)
 	print(feature.shape)
 	plt.yticks([])
 	plt.imshow(feature,cmap = cm.Greys_r)
 	plt.savefig("../result/feature.eps",format="eps")
+=======
+	#print(feature)
+	plt.imshow(feature,cmap = cm.Greys_r)
+>>>>>>> 162bf8fb56f49c5dda2580a420014a1b1b2be0a3
 	plt.show()
 
 	#visualize feature map of Convolution Layer
@@ -53,4 +63,8 @@ def getvoipfeature(rows=100):
 		plt.show()
 
 if __name__=="__main__":
+<<<<<<< HEAD
 	getvoipfeature(rows=10)
+=======
+	getvoipfeature(rows=100)
+>>>>>>> 162bf8fb56f49c5dda2580a420014a1b1b2be0a3
