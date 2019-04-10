@@ -696,7 +696,40 @@ def processpcap():
                 rows+=1
             i += 1
 
-def cal_sim():
+def psd_predict():
+    import os
+    if (platform.uname()[0] == "Linux"):
+        psd_path = "/home/kang/Documents/data/psd"
+        pre_psd_path = "/home/kang/Documents/data/psd_predict"
+    elif (platform.uname()[0] == "Darwin"):
+        psd_path = "/Users/kang/Documents/workspace/data/psd" 
+        pre_psd_path = "/Users/kang/Documents/workspace/data/psd_predict" 
+
+    result = open("results.txt", "a")
+
+    true_sample = 0
+    false_sample = 0
+
+    sim = 9999
+
+    predict_result = "unknown"
+
+    for pre_file in os.listdir(pre_psd_path):
+        real_result = pre_file.split(".")[0]
+        for line in open(os.path.join(pre_psd_path,pre_file)):
+            for file in os.listdir(psd_path):
+                predict_voip = file.split(".")[0]
+                for cmp_line in open(os.path.join(psd_path, file)):
+                    pre_sim = cal_sim(line, cmp_line)
+                    if(pre_sim<sim):
+                        predict_result = predict_voip
+        write2file()
+        if(real_result==predict_result):
+            true_sample += 1
+        else:
+            false_sample += 1
+
+def cal_sim(line, cmp_line):
     
 
 
