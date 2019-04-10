@@ -23,7 +23,7 @@ def load_data(rows=100):
 	    nnum = 0
             voipdir = os.path.join(filepath,di)
 	    dirfiles = os.listdir(voipdir)
-            for ik in range(0,1000):
+            for ik in range(0,2000):
 		i = dirfiles[ik]
                 if(i.__contains__(".png")):
                     img = Image.open(os.path.join(voipdir,i))

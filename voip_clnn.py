@@ -136,7 +136,7 @@ def train(rows=100):
 	#使用early stopping返回最佳epoch对应的model
 	early_stopping = EarlyStopping(monitor='loss', patience=1)
 	#全部载入内存
-	model.fit(X_train, Y_train, batch_size=100,validation_data=(X_val, Y_val),epochs=20,callbacks=[early_stopping,lrate])
+	model.fit(X_train, Y_train, batch_size=50,validation_data=(X_val, Y_val),epochs=20,callbacks=[early_stopping,lrate])
 	
 	json_string = model.to_json()
 	open('../data/model_json/alexnet_model_architecture_'+str(rows)+'.json','w').write(json_string)
@@ -147,8 +147,8 @@ def train(rows=100):
 	open('../data/model_json/result.txt', 'a+').write("pkt_num:%d, loss:%f, accuracy:%f\r\n"%(rows,loss,accuracy))
 
 if __name__=="__main__":
-	#rs = [6,8,10,20,40,100]
+	#rs = [2,4,6,8,10,20,40,100]
 	#for rows in rs:
 	#	train(rows=rows)
-	#train(rows=6)
-	check_print(rows=100)
+	train(rows=100)
+	#check_print(rows=100)
