@@ -508,6 +508,8 @@ def savepsd2xlsx():
     tables.append(table)
     table = workbook.add_sheet('Bria') #9
     tables.append(table)
+    table = workbook.add_sheet('non-voip') #9
+    tables.append(table)
     for sheet in tables:
         sheet.write(0,0,"length")
         if(sheet.name=="Skype"):
@@ -530,9 +532,13 @@ def savepsd2xlsx():
             filename = filepath + "/expresstalk/expresstalk1.pcap"
         if(sheet.name=="Bria"):
             filename = filepath + "/bria/bria1.pcap"
+        if(sheet.name=="non-voip"):
+            filename = filepath + "/non-voip/tencent.pcap"
         (packets_init, max_len) = pcap2packetspayload(filename)
         tr = 1
         for i in range(len(packets_init)):
+            if tr>60000:
+                break
             sheet.write(tr,0,len(packets_init[i]))
             tr = tr+1
     workbook.save("psd.xlsx")
@@ -565,6 +571,8 @@ def savepsd2xlsx_2():
     tables.append(table)
     table = workbook.add_sheet('Bria') #9
     tables.append(table)
+    table = workbook.add_sheet('non-voip') #9
+    tables.append(table)
     for sheet in tables:
         sheet.write(0,0,"length")
         if(sheet.name=="Skype12"):
@@ -589,5 +597,5 @@ def savepsd2xlsx_2():
 if __name__=="__main__":
     #for packet in packets_init:
     #    print(len(packet))
-    savepsd2xlsx_2()
+    savepsd2xlsx()
                         

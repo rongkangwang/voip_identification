@@ -513,6 +513,8 @@ def saveitd2xlsx():
     tables.append(table)
     table = workbook.add_sheet('Bria') #9
     tables.append(table)
+    table = workbook.add_sheet('non-voip') #9
+    tables.append(table)
     for sheet in tables:
         sheet.write(0,0,"length")
         if(sheet.name=="Skype"):
@@ -535,9 +537,13 @@ def saveitd2xlsx():
             filename = filepath + "/expresstalk/expresstalk1.pcap"
         if(sheet.name=="Bria"):
             filename = filepath + "/bria/bria1.pcap"
+        if(sheet.name=="non-voip"):
+            filename = filepath + "/non-voip/tencent.pcap"
         (packets_init, max_len) = pcap2packetspayload(filename)
         tr = 1
         for i in range(len(packets_init)-1):
+            if tr>60000:
+                break
             current_t = datetime.datetime.utcfromtimestamp(packets_init[i][0]).second+datetime.datetime.utcfromtimestamp(packets_init[i][0]).microsecond/1000000.0
             next_t = datetime.datetime.utcfromtimestamp(packets_init[i+1][0]).second+datetime.datetime.utcfromtimestamp(packets_init[i+1][0]).microsecond/1000000.0
             #print(next_t-current_t)

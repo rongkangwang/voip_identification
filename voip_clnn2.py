@@ -13,7 +13,7 @@ from keras.utils import np_utils, generic_utils
 import numpy as np
 import random,cPickle
 
-nb_class = 10
+nb_class = 11
 
 def create_clnn_model(input_shape=(100,256,1)):
 	img_input=Input(input_shape)
@@ -155,5 +155,5 @@ if __name__=="__main__":
 	#rs = [6,8,10,20,40,100]
 	#for rows in rs:
 	#	train(rows=rows)
-	train(rows=10)
-	#check_print(rows=100)
+	#train(rows=10)
+	check_print(rows=100)
