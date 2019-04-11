@@ -705,7 +705,7 @@ def psd_predict():
         psd_path = "/Users/kang/Documents/workspace/data/psd" 
         pre_psd_path = "/Users/kang/Documents/workspace/data/psd_predict" 
 
-    result = open("results.txt", "a")
+    result_file = open("results.txt", "a")
 
     true_sample = 0
     false_sample = 0
@@ -722,16 +722,27 @@ def psd_predict():
                 for cmp_line in open(os.path.join(psd_path, file)):
                     pre_sim = cal_sim(line, cmp_line)
                     if(pre_sim<sim):
+                        sim = pre_sim
                         predict_result = predict_voip
-        write2file()
+        write2file(sim, real_result, predict_result, result_file)
         if(real_result==predict_result):
             true_sample += 1
         else:
             false_sample += 1
 
-def cal_sim(line, cmp_line):
-    
+def write2file(sim, real_result, predict_result, result_file):
+    result_file.write(str(sim)+" "+real_result+" "+predict_result+"\r\n")
 
+import math
+def cal_sim(line, cmp_line):
+    pair = line.split(" ")
+    cmp_pair = cmp_line.split(" ")
+    # calculate the similiarity
+    sim = 0
+    for i in range(len(pair)):
+        sim += np.power(float(pair[i])*float(cmp_pair[i]),0.5)
+    sim = 2 * math.log(sim,2)
+    return sim
 
 
 if __name__=="__main__":
