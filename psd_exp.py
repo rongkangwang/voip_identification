@@ -715,20 +715,29 @@ def psd_predict():
     predict_result = "unknown"
 
     for pre_file in os.listdir(pre_psd_path):
-        real_result = pre_file.split(".")[0]
-        for line in open(os.path.join(pre_psd_path,pre_file)):
-            for file in os.listdir(psd_path):
-                predict_voip = file.split(".")[0]
-                for cmp_line in open(os.path.join(psd_path, file)):
-                    pre_sim = cal_sim(line, cmp_line)
-                    if(pre_sim<sim):
-                        sim = pre_sim
-                        predict_result = predict_voip
-        write2file(sim, real_result, predict_result, result_file)
-        if(real_result==predict_result):
-            true_sample += 1
-        else:
-            false_sample += 1
+        if(pre_file=="xlite.txt" or pre_file=="alt.txt" or pre_file=="bria.txt" or pre_file=="expresstalk.txt" or pre_file=="eyebeam.txt" or pre_file=="jumblo.txt" or pre_file=="kc.txt" or pre_file=="skype.txt" or pre_file=="uu.txt" or pre_file=="zoiper.txt"):
+            real_result = pre_file.split(".")[0]
+            for line in open(os.path.join(pre_psd_path,pre_file)):
+                for file in os.listdir(psd_path):
+                    if(file=="xlite.txt" or file=="alt.txt" or file=="bria.txt" or file=="expresstalk.txt" or file=="eyebeam.txt" or file=="jumblo.txt" or file=="kc.txt" or file=="skype.txt" or file=="uu.txt" or file=="zoiper.txt"):
+                        print file
+                        predict_voip = file.split(".")[0]
+                        count_line = 0
+                        for cmp_line in open(os.path.join(psd_path, file)):
+                            count_line += 1
+                            #print cmp_line
+                            pre_sim = cal_sim(line, cmp_line)
+                            if(abs(pre_sim)<=sim):
+                                sim = abs(pre_sim)
+                                predict_result = predict_voip
+                            if(count_line==100):
+                                break
+                write2file(sim, real_result, predict_result, result_file)
+                if(real_result==predict_result):
+                    true_sample += 1
+                else:
+                    false_sample += 1
+    print("true_sample -> "+str(true_sample)+", "+"false_sample -> "+str(false_sample))
 
 def write2file(sim, real_result, predict_result, result_file):
     result_file.write(str(sim)+" "+real_result+" "+predict_result+"\r\n")
@@ -739,13 +748,19 @@ def cal_sim(line, cmp_line):
     cmp_pair = cmp_line.split(" ")
     # calculate the similiarity
     sim = 0
-    for i in range(len(pair)):
+    for i in range(300):
+        #print pair[i]
+        #print cmp_pair[i]
         sim += np.power(float(pair[i])*float(cmp_pair[i]),0.5)
-    sim = 2 * math.log(sim,2)
+    #print sim
+    if(sim>0):
+        sim = 2 * math.log(sim,2)
+    else:
+        sim = 0
     return sim
 
 
 if __name__=="__main__":
     #construct_pro()
-    processpcap()
+    psd_predict()
                         
