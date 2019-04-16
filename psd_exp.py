@@ -607,11 +607,12 @@ def construct_pro():
         while i < len(packets_init):
             if(subflow_num==500):
                 break
-            if(rows==100):
+            # rows control the number of subflow packets
+            if(rows==1000):
                 write2psd(dict_psd, psdfile)
                 rows = 0
                 subflow_num += 1
-                i = i - 90
+                i = i - 990
                 for k in range(1,301):
                     dict_psd[k] = 0
             if(len(packets_init[i][1])<=300):
@@ -684,11 +685,11 @@ def processpcap():
         while i < len(packets_init):
             if(subflow_num==100):
                 break
-            if(rows==100):
+            if(rows==1000):
                 write2psd(dict_psd, psdfile)
                 rows = 0
                 subflow_num += 1
-                i = i - 80
+                i = i - 980
                 for k in range(1,301):
                     dict_psd[k] = 0
             if(len(packets_init[i][1])<=300):
@@ -705,33 +706,44 @@ def psd_predict():
         psd_path = "/Users/kang/Documents/workspace/data/psd" 
         pre_psd_path = "/Users/kang/Documents/workspace/data/psd_predict" 
 
-    result_file = open("results.txt", "a")
+    result_file = open("results.txt", "a+")
 
     true_sample = 0
     false_sample = 0
 
-    sim = 9999
+    sim = 999999999
 
     predict_result = "unknown"
 
     for pre_file in os.listdir(pre_psd_path):
         if(pre_file=="xlite.txt" or pre_file=="alt.txt" or pre_file=="bria.txt" or pre_file=="expresstalk.txt" or pre_file=="eyebeam.txt" or pre_file=="jumblo.txt" or pre_file=="kc.txt" or pre_file=="skype.txt" or pre_file=="uu.txt" or pre_file=="zoiper.txt"):
             real_result = pre_file.split(".")[0]
+            sim = 999999999
             for line in open(os.path.join(pre_psd_path,pre_file)):
                 for file in os.listdir(psd_path):
                     if(file=="xlite.txt" or file=="alt.txt" or file=="bria.txt" or file=="expresstalk.txt" or file=="eyebeam.txt" or file=="jumblo.txt" or file=="kc.txt" or file=="skype.txt" or file=="uu.txt" or file=="zoiper.txt"):
                         print file
                         predict_voip = file.split(".")[0]
                         count_line = 0
+
+                        sum_sim = 0.0
+
                         for cmp_line in open(os.path.join(psd_path, file)):
                             count_line += 1
                             #print cmp_line
                             pre_sim = cal_sim(line, cmp_line)
-                            if(abs(pre_sim)<=sim):
-                                sim = abs(pre_sim)
-                                predict_result = predict_voip
+                            # if(abs(pre_sim)<=sim):
+                            #     sim = abs(pre_sim)
+                            #     predict_result = predict_voip
+                            sum_sim += abs(pre_sim)
                             if(count_line==100):
                                 break
+                        print("real voip -> "+real_result+", predict voip -> "+predict_voip+", "+"sum_sim -> "+str(sum_sim))
+                        if(sum_sim<sim):
+                            sim = sum_sim
+                            predict_result = predict_voip
+                            #print("real -> "+real_result+", "+"predict -> "+predict_result+", sim -> "+str(sim))
+                print("real -> "+real_result+", "+"predict -> "+predict_result+", sim -> "+str(sim))
                 write2file(sim, real_result, predict_result, result_file)
                 if(real_result==predict_result):
                     true_sample += 1
@@ -742,8 +754,10 @@ def psd_predict():
 def write2file(sim, real_result, predict_result, result_file):
     result_file.write(str(sim)+" "+real_result+" "+predict_result+"\r\n")
 
+#count=0
 import math
 def cal_sim(line, cmp_line):
+    #global count
     pair = line.split(" ")
     cmp_pair = cmp_line.split(" ")
     # calculate the similiarity
@@ -753,14 +767,19 @@ def cal_sim(line, cmp_line):
         #print cmp_pair[i]
         sim += np.power(float(pair[i])*float(cmp_pair[i]),0.5)
     #print sim
-    if(sim>0):
+    if(abs(sim)>0):
+        #count+=1
+        #print("before -> "+str(sim))
         sim = 2 * math.log(sim,2)
+        #print("after -> "+str(sim))
     else:
-        sim = 0
+        sim = 9999
+    #print("count -> "+ str(count))
     return sim
 
 
 if __name__=="__main__":
     #construct_pro()
+    #processpcap()
     psd_predict()
                         
